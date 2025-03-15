@@ -1,0 +1,12 @@
+[workspace.package]
+version = "0.1.0" #
+edition = "2021"
+
+[workspace]
+members = ["crates/api", "crates/models", "crates/structures"]
+
+resolver = "2"
+
+[workspace.dependencies]
+serde = "1.0"
+tokio = { version = "1", features = ["full"] }

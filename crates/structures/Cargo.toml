@@ -1,0 +1,6 @@
+[package]
+name = "structures"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
