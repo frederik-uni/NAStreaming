@@ -15,6 +15,7 @@ log = "0.4.26"
 actix-web = "4"
 env_logger = "0.11.7"
 actix-cors = "0.7.1"
+structures = {path="crates/structures"}
 
 schemars = { package = "apistos-schemars", version = "0.8" }
 apistos = "0.4"

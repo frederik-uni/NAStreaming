@@ -12,3 +12,4 @@ env_logger = {workspace = true}
 actix-cors =  {workspace = true}
 schemars = { workspace = true }
 apistos = { workspace = true, features = ["swagger-ui", "rapidoc", "redoc", "scalar", "multipart", "actix-web-grants"] }
+structures = {workspace = true, features = ["openapi"]}

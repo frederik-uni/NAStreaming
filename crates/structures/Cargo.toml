@@ -4,3 +4,9 @@ version = { workspace = true }
 edition = { workspace = true }
 
 [dependencies]
+serde = {workspace = true}
+schemars = { workspace = true, optional=true }
+apistos = { workspace = true, optional=true }
+
+[features]
+openapi = ["dep:schemars", "dep:apistos"]

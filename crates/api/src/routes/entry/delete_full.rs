@@ -1,4 +1,6 @@
+use actix_web::web::Json;
 use apistos::{actix::CreatedJson, api_operation};
+use structures::IdRequest;
 
 use crate::error::ApiResult;
 
@@ -7,7 +9,7 @@ use crate::error::ApiResult;
     summary = "Deletes everything including the files",
     description = r###""###
 )]
-async fn exec() -> ApiResult<CreatedJson<u8>> {
+async fn exec(Json(id): Json<IdRequest>) -> ApiResult<CreatedJson<u8>> {
     Ok(CreatedJson(0))
 }
 
