@@ -3,7 +3,7 @@ version = "0.1.0" #
 edition = "2021"
 
 [workspace]
-members = ["crates/api", "crates/models", "crates/structures"]
+members = ["crates/api", "crates/metadata-providers/anemyfr", "crates/metadata-providers/anidb", "crates/metadata-providers/anilist", "crates/metadata-providers/anime-characters-database", "crates/metadata-providers/anime-news-network", "crates/metadata-providers/anime-planet", "crates/metadata-providers/animecountdown", "crates/metadata-providers/animedb-jp", "crates/metadata-providers/anisearch", "crates/metadata-providers/duckduckgo", "crates/metadata-providers/fanart-tv", "crates/metadata-providers/fandom", "crates/metadata-providers/gamdb", "crates/metadata-providers/imdb", "crates/metadata-providers/is-this-dubbed", "crates/metadata-providers/kitsu", "crates/metadata-providers/livechart", "crates/metadata-providers/myanimelist", "crates/metadata-providers/notify-moe", "crates/metadata-providers/rottentomatoes", "crates/metadata-providers/simkl", "crates/metadata-providers/themoviedb", "crates/metadata-providers/thetvdb", "crates/metadata-providers/trakt", "crates/models", "crates/structures"]
 
 resolver = "2"
 

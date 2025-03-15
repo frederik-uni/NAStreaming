@@ -1,0 +1,6 @@
+[package]
+name = "fandom"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

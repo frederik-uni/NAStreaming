@@ -1,0 +1,6 @@
+[package]
+name = "animedb-jp"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

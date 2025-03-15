@@ -289,6 +289,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "anemyfr"
+version = "0.1.0"
+
+[[package]]
+name = "anidb"
+version = "0.1.0"
+
+[[package]]
+name = "anilist"
+version = "0.1.0"
+
+[[package]]
+name = "anime-characters-database"
+version = "0.1.0"
+
+[[package]]
+name = "anime-news-network"
+version = "0.1.0"
+
+[[package]]
+name = "anime-planet"
+version = "0.1.0"
+
+[[package]]
+name = "animecountdown"
+version = "0.1.0"
+
+[[package]]
+name = "animedb-jp"
+version = "0.1.0"
+
+[[package]]
+name = "anisearch"
+version = "0.1.0"
+
+[[package]]
 name = "anstream"
 version = "0.6.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -765,6 +801,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "duckduckgo"
+version = "0.1.0"
+
+[[package]]
 name = "dyn-clone"
 version = "1.0.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -817,6 +857,14 @@ dependencies = [
  "libc",
  "windows-sys 0.59.0",
 ]
+
+[[package]]
+name = "fanart-tv"
+version = "0.1.0"
+
+[[package]]
+name = "fandom"
+version = "0.1.0"
 
 [[package]]
 name = "fastrand"
@@ -897,6 +945,10 @@ dependencies = [
  "pin-utils",
  "slab",
 ]
+
+[[package]]
+name = "gamdb"
+version = "0.1.0"
 
 [[package]]
 name = "generic-array"
@@ -1131,6 +1183,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "imdb"
+version = "0.1.0"
+
+[[package]]
 name = "impl-more"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1146,6 +1202,10 @@ dependencies = [
  "hashbrown",
  "serde",
 ]
+
+[[package]]
+name = "is-this-dubbed"
+version = "0.1.0"
 
 [[package]]
 name = "is_terminal_polyfill"
@@ -1193,6 +1253,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "kitsu"
+version = "0.1.0"
+
+[[package]]
 name = "language-tags"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1215,6 +1279,10 @@ name = "litemap"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "23fb14cb19457329c82206317a5663005a4d404783dc74f4252769b0d5f42856"
+
+[[package]]
+name = "livechart"
+version = "0.1.0"
 
 [[package]]
 name = "local-channel"
@@ -1290,6 +1358,17 @@ dependencies = [
 
 [[package]]
 name = "models"
+version = "0.1.0"
+dependencies = [
+ "structures",
+]
+
+[[package]]
+name = "myanimelist"
+version = "0.1.0"
+
+[[package]]
+name = "notify-moe"
 version = "0.1.0"
 
 [[package]]
@@ -1584,6 +1663,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
+name = "rottentomatoes"
+version = "0.1.0"
+
+[[package]]
 name = "rust_decimal"
 version = "1.36.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1739,6 +1822,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "simkl"
+version = "0.1.0"
+
+[[package]]
 name = "slab"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1828,6 +1915,14 @@ dependencies = [
  "rustix",
  "windows-sys 0.59.0",
 ]
+
+[[package]]
+name = "themoviedb"
+version = "0.1.0"
+
+[[package]]
+name = "thetvdb"
+version = "0.1.0"
 
 [[package]]
 name = "time"
@@ -1965,6 +2060,10 @@ checksum = "e672c95779cf947c5311f83787af4fa8fffd12fb27e4993211a84bdfd9610f9c"
 dependencies = [
  "once_cell",
 ]
+
+[[package]]
+name = "trakt"
+version = "0.1.0"
 
 [[package]]
 name = "typenum"

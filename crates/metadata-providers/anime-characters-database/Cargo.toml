@@ -1,0 +1,6 @@
+[package]
+name = "anime-characters-database"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

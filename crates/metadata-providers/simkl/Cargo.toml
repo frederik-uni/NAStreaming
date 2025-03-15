@@ -1,0 +1,6 @@
+[package]
+name = "simkl"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

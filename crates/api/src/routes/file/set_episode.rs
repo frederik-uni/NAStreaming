@@ -1,14 +1,16 @@
+use actix_web::web::Json;
 use apistos::{actix::CreatedJson, api_operation};
+use structures::file::SetEpisodeRequest;
 
-use crate::error::ApiResult;
+use crate::error::{ApiError, ApiResult};
 
 #[api_operation(
     tag = "file",
     summary = "Validate the detected episode",
     description = r###""###
 )]
-async fn exec() -> ApiResult<CreatedJson<u8>> {
-    Ok(CreatedJson(0))
+async fn exec(Json(data): Json<SetEpisodeRequest>) -> ApiResult<CreatedJson<u16>> {
+    Err(ApiError::NotImplemented)
 }
 
 pub fn register() -> apistos::web::Resource {

@@ -1,0 +1,6 @@
+[package]
+name = "is-this-dubbed"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

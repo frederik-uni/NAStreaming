@@ -8,7 +8,9 @@ pub type ApiResult<T> = Result<T, ApiError>;
 
 #[derive(Debug, ApiErrorComponent)]
 #[openapi_error(status(code = 405, description = "Invalid input"))]
-pub enum ApiError {}
+pub enum ApiError {
+    NotImplemented,
+}
 
 impl Display for ApiError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

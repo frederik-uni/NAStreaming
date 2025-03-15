@@ -1,0 +1,6 @@
+[package]
+name = "imdb"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

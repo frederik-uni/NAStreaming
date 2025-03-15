@@ -1,5 +1,7 @@
 use std::{collections::HashMap, time::Duration};
 
+use structures::{Kind, Status};
+
 pub type Id = String;
 pub type LocationId = String;
 pub type LanguageId = String;
@@ -73,10 +75,6 @@ pub enum AssetKind {
     Art,
 }
 
-pub enum Kind {
-    Movie,
-    Servies,
-}
 pub enum ContentRating {
     USA(ContentRatingUSA),
     Brazil(u8),
@@ -90,11 +88,6 @@ pub enum ContentRatingUSA {
     NC17,
 }
 
-pub enum Status {
-    Released,
-    Releasing,
-    Upcoming,
-}
 pub enum Source {
     TheTvDb(u64),
     TheMovieDb(u64),

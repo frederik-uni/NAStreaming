@@ -1,14 +1,16 @@
-use apistos::{actix::CreatedJson, api_operation};
+use actix_web::web::Json;
+use apistos::api_operation;
+use structures::HomeResponse;
 
-use crate::error::ApiResult;
+use crate::error::{ApiError, ApiResult};
 
 #[api_operation(
     tag = "home",
     summary = "Homeapge data",
     description = r###"Homeapge data"###
 )]
-async fn exec() -> ApiResult<CreatedJson<u8>> {
-    Ok(CreatedJson(0))
+async fn exec() -> ApiResult<Json<HomeResponse>> {
+    Err(ApiError::NotImplemented)
 }
 
 pub fn register() -> apistos::web::Resource {

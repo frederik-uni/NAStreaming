@@ -1,12 +1,14 @@
-use apistos::{actix::CreatedJson, api_operation};
+use actix_web::web::Json;
+use apistos::api_operation;
+use structures::user::{JWTReponse, SignInRequest};
 
-use crate::error::ApiResult;
+use crate::error::{ApiError, ApiResult};
 
 #[api_operation(tag = "user", summary = "Sign in", description = r###""###)]
-async fn exec() -> ApiResult<CreatedJson<u8>> {
-    Ok(CreatedJson(0))
+async fn exec(Json(data): Json<SignInRequest>) -> ApiResult<Json<JWTReponse>> {
+    Err(ApiError::NotImplemented)
 }
 
 pub fn register() -> apistos::web::Resource {
-    apistos::web::resource("/sign-in").route(apistos::web::get().to(exec))
+    apistos::web::resource("/sign-in").route(apistos::web::post().to(exec))
 }

@@ -1,0 +1,6 @@
+[package]
+name = "trakt"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

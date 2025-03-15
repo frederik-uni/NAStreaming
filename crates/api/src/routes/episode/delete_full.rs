@@ -1,16 +1,16 @@
 use actix_web::web::Json;
-use apistos::{actix::CreatedJson, api_operation};
+use apistos::api_operation;
 use structures::IdRequest;
 
-use crate::error::ApiResult;
+use crate::error::{ApiError, ApiResult};
 
 #[api_operation(
     tag = "episode",
     summary = "Deletes everything including the files",
     description = r###""###
 )]
-async fn exec(Json(id): Json<IdRequest>) -> ApiResult<CreatedJson<u8>> {
-    Ok(CreatedJson(0))
+async fn exec(Json(id): Json<IdRequest>) -> ApiResult<Json<u16>> {
+    Err(ApiError::NotImplemented)
 }
 
 pub fn register() -> apistos::web::Resource {

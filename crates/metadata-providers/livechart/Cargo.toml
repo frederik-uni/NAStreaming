@@ -1,0 +1,6 @@
+[package]
+name = "livechart"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
