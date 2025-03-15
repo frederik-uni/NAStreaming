@@ -6,6 +6,7 @@ pub mod entry;
 pub mod episodes;
 pub mod file;
 pub mod metadata_provider;
+pub mod movie_lib;
 pub mod search;
 pub mod user;
 
