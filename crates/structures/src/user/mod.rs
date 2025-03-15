@@ -36,6 +36,15 @@ pub struct SignInRequest {
     feature = "openapi",
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
+pub struct RefreshRequest {
+    pub refresh_token: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "openapi",
+    derive(schemars::JsonSchema, apistos::ApiComponent)
+)]
 pub struct JWTReponse {
     pub access_token: String,
     pub refresh_token: String,
