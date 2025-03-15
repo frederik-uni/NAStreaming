@@ -4,3 +4,11 @@ version = { workspace = true }
 edition = { workspace = true }
 
 [dependencies]
+toml = { workspace  = true}
+serde = {workspace = true, features = ["derive"]}
+log = {workspace = true}
+actix-web ={workspace = true}
+env_logger = {workspace = true}
+actix-cors =  {workspace = true}
+schemars = { workspace = true }
+apistos = { workspace = true, features = ["swagger-ui", "rapidoc", "redoc", "scalar", "multipart", "actix-web-grants"] }
