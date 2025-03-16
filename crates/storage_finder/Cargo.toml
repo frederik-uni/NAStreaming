@@ -1,0 +1,11 @@
+[package]
+name = "storage-finder"
+version = { workspace = true }
+edition = { workspace = true }
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+walkdir = { workspace=true }
+regex = {  workspace=true }
+serde = { workspace=true, features = ["derive"] }
