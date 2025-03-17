@@ -15,3 +15,18 @@ pub fn get_ep_regex() -> Regex {
 pub fn get_season_regex() -> Regex {
     Regex::new(r"season (\d+)").expect("Regex pattern should never fail")
 }
+
+pub struct RegexRegistry {
+    pub season_regex: Regex,
+    pub ep_regex: Regex,
+    pub sq_bracket_regex: Regex,
+    pub year_regex: Regex,
+}
+
+impl Default for RegexRegistry {
+    fn default() -> Self {
+        Self {
+
+        }
+    }
+}

@@ -1,3 +1,4 @@
+mod get_dir;
 mod list;
 mod set_entry;
 mod set_episode;

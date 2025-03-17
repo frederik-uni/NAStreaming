@@ -1,4 +1,6 @@
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Serialize)]
 pub enum FileType {
     Video(VideoExtension),
     Subtitle {
@@ -46,7 +48,7 @@ impl<'a> TryFrom<&'a str> for FileType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum VideoExtension {
     ThreeGP,
     Asf,
@@ -106,7 +108,7 @@ impl<'a> TryFrom<&'a str> for VideoExtension {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum SubtitleExtension {
     /// SRT
     SubRip,
@@ -169,7 +171,7 @@ impl<'a> TryFrom<&'a str> for SubtitleExtension {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum AudioExtension {
     Mka,
     MP3,

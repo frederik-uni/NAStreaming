@@ -1,0 +1,9 @@
+[package]
+name = "read-once-memory"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+env_logger = "0.10"
+fuser = "0.15.1"
+libc = "0.2"

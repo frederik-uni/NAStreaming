@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -75,4 +75,32 @@ pub struct MovieItem {
     img: Option<String>,
     color: String,
     progress: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "openapi",
+    derive(schemars::JsonSchema, apistos::ApiComponent)
+)]
+pub struct DirRequest {
+    pub path: PathBuf,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "openapi",
+    derive(schemars::JsonSchema, apistos::ApiComponent)
+)]
+pub struct DirResponse {
+    pub items: Vec<File>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "openapi",
+    derive(schemars::JsonSchema, apistos::ApiComponent)
+)]
+pub struct File {
+    pub dir: bool,
+    pub name: String,
 }
