@@ -264,6 +264,6 @@ fn main() {
     //fs.create_file("hello.txt", b"Hello, world!".to_vec());
 
     let mountpoint = "/tmp/memdisk-once";
-    create_dir_all(mountpoint);
-    fuser::mount2(fs, &mountpoint, &[]).unwrap();
+    let _ = create_dir_all(mountpoint);
+    let _ = fuser::spawn_mount2(fs, &mountpoint, &[]);
 }
