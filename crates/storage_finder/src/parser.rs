@@ -9,7 +9,7 @@ use crate::resolution::Resolutions;
 use crate::segments::{parse_segments, segements2_to_tuple, Episode, Segment, Segment2};
 use crate::suffixes::{suffix_folder, suffixes, Cut, FileType, Kind, ThreeD};
 
-pub fn parse_library(p: &Path, illegal: &Vec<PathBuf>) -> Vec<Entry> {
+pub fn parse_library(p: &Path, illegal: &HashSet<PathBuf>) -> Vec<Entry> {
     let parse = read_dir(p)
         .into_iter()
         .flat_map(|v| parse_top(v, illegal))
@@ -169,7 +169,7 @@ fn parse_like_file(file_name: &str) -> Parsed {
     }
 }
 
-fn parse_file(path: &PathBuf, illegal: &Vec<PathBuf>) -> Option<Parsed> {
+fn parse_file(path: &PathBuf, illegal: &HashSet<PathBuf>) -> Option<Parsed> {
     if illegal.contains(path) {
         return None;
     }
@@ -192,7 +192,7 @@ fn read_dir(path: &Path) -> Vec<PathBuf> {
         .unwrap_or_default()
 }
 
-fn parse_top(path: PathBuf, illegal: &Vec<PathBuf>) -> Vec<Parsed> {
+fn parse_top(path: PathBuf, illegal: &HashSet<PathBuf>) -> Vec<Parsed> {
     if path.is_file() {
         match parse_file(&path, illegal) {
             Some(v) => vec![v.set_path(path)],
@@ -212,7 +212,7 @@ fn parse_top(path: PathBuf, illegal: &Vec<PathBuf>) -> Vec<Parsed> {
     }
 }
 
-fn parse_2(path: PathBuf, illegal: &Vec<PathBuf>, data: &Parsed) -> Vec<Parsed> {
+fn parse_2(path: PathBuf, illegal: &HashSet<PathBuf>, data: &Parsed) -> Vec<Parsed> {
     if path.is_file() {
         match parse_file(&path, illegal) {
             Some(v) => vec![data.join(&v).set_path(path)],
@@ -255,7 +255,7 @@ fn parse_season(input: &str) -> Option<u64> {
     None
 }
 
-fn parse_3(path: PathBuf, illegal: &Vec<PathBuf>, data: &Parsed) -> Vec<Parsed> {
+fn parse_3(path: PathBuf, illegal: &HashSet<PathBuf>, data: &Parsed) -> Vec<Parsed> {
     if path.is_file() {
         match parse_file(&path, illegal) {
             Some(v) => vec![data.join(&v).set_path(path)],
@@ -281,7 +281,7 @@ fn parse_3(path: PathBuf, illegal: &Vec<PathBuf>, data: &Parsed) -> Vec<Parsed> 
     }
 }
 
-fn parse_4(path: PathBuf, illegal: &Vec<PathBuf>, data: &Parsed) -> Vec<Parsed> {
+fn parse_4(path: PathBuf, illegal: &HashSet<PathBuf>, data: &Parsed) -> Vec<Parsed> {
     if path.is_file() {
         match parse_file(&path, illegal) {
             Some(v) => vec![data.join(&v).set_path(path)],

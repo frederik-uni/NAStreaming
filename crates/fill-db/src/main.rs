@@ -28,6 +28,7 @@ async fn main() {
         }
         scan.push_back((item.path, item.series))
     }
+
     for (path, _) in scan {
         let items = storage_finder::parse_library(&path, &vec![]);
         File::create("temp.json")
