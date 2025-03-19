@@ -1,12 +1,52 @@
-use ffmpeg_next::{format, media, Dictionary, Rational};
+use ffmpeg_next::{
+    format::{self, context::Input},
+    media, Dictionary, Packet, Rational,
+};
+use std::{
+    collections::BTreeMap,
+    sync::{Arc, Mutex},
+};
+
+pub struct Map {
+    map: BTreeMap<i64, Packet>,
+    done: bool,
+}
+
+impl Map {
+    fn insert(&mut self, key: i64, value: Packet) -> Option<Packet> {
+        self.map.insert(key, value)
+    }
+    fn done(&mut self) {
+        self.done = true;
+    }
+}
+
+fn generate_map(mut ictx: Input, map: Arc<Mutex<Map>>) {
+    let mut last_timestamp = None;
+    let mut last_packet = Packet::empty();
+    for (stream, packet) in ictx.packets() {
+        if last_timestamp.is_none() {
+            last_timestamp = Some(0.0);
+            map.lock().unwrap().insert(0, last_packet.clone());
+        } else if let Some(pts) = packet.pts() {
+            let time_base = stream.time_base();
+            let pts_in_seconds = (time_base.0 as i64 * pts) as f64 / time_base.1 as f64;
+            if pts_in_seconds >= last_timestamp.unwrap() + 2.0 {
+                map.lock().unwrap().insert(pts, last_packet.clone());
+                last_timestamp = Some(pts_in_seconds);
+            }
+        }
+        last_packet = packet;
+    }
+
+    map.lock().unwrap().done();
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     ffmpeg_next::init().unwrap();
 
-    let mut ictx = format::input(&"/Users/frederik/movie_files/file.mkv")?;
-
-    let mut octx = format::output(&"output.m3u8")?;
-
+    let mut ictx = format::input(&"/Users/frederik/movie_files/test.mkv")?;
+    let mut octx = format::output("output.ts")?;
     let mut stream_map = Vec::new();
     for (i, istream) in ictx.streams().enumerate() {
         if istream.parameters().medium() == media::Type::Video {

@@ -35,42 +35,6 @@ pub struct EpisodeResult {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum Cut {
-    Extended,
-    Cinematic,
-    Director,
-}
-
-impl Cut {
-    fn arr() -> Vec<Self> {
-        vec![Self::Extended, Self::Cinematic, Self::Director]
-    }
-}
-
-impl Display for Cut {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Cut::Extended => write!(f, "extended cut"),
-            Cut::Cinematic => write!(f, "cinematic cut"),
-            Cut::Director => write!(f, "directors cut"),
-        }
-    }
-}
-
-impl TryFrom<String> for Cut {
-    type Error = ();
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.as_str() {
-            "extended cut" => Ok(Self::Cinematic),
-            "cinematic cu" => Ok(Self::Extended),
-            "directors cut" | "director's cut" => Ok(Self::Director),
-            _ => Err(()),
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct MovieResult {
     pub main_path: PathBuf,
     pub path: PathBuf,
@@ -86,43 +50,6 @@ pub enum EntryChild {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum ThreeD {
-    Hsbs,
-    Fsbs,
-    Htab,
-    Ftab,
-    Mvc,
-}
-
-impl Display for ThreeD {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ThreeD::Hsbs => write!(f, "hsbs"),
-            ThreeD::Fsbs => write!(f, "fsbs"),
-            ThreeD::Htab => write!(f, "htab"),
-            ThreeD::Ftab => write!(f, "ftab"),
-            ThreeD::Mvc => write!(f, "mvc"),
-        }
-    }
-}
-
-impl TryFrom<String> for ThreeD {
-    type Error = ();
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.as_str() {
-            "hsbs" => Ok(Self::Hsbs),
-            "fsbs" => Ok(Self::Fsbs),
-            "htab" => Ok(Self::Htab),
-            "ftab" => Ok(Self::Ftab),
-            "mvc" => Ok(Self::Mvc),
-
-            _ => Err(()),
-        }
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct Entry {
     pub name: String,
     pub children: EntryChild,
@@ -133,88 +60,6 @@ pub struct Entry {
 impl Entry {
     pub fn items(self) -> Vec<EntryChild> {
         todo!()
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub enum Kind {
-    Trailers,
-    Intros,
-    Outros,
-    Soundtracks,
-    BehindTheScenes,
-    DeletedScenes,
-    Interviews,
-    Scenes,
-    Samples,
-    Shorts,
-    Featurettes,
-    Clips,
-}
-
-impl Kind {
-    fn arr() -> Vec<Self> {
-        vec![
-            Self::Trailers,
-            Self::Intros,
-            Self::Outros,
-            Self::Soundtracks,
-            Self::BehindTheScenes,
-            Self::DeletedScenes,
-            Self::Interviews,
-            Self::Scenes,
-            Self::Samples,
-            Self::Shorts,
-            Self::Featurettes,
-            Self::Clips,
-        ]
-    }
-}
-
-impl Display for Kind {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Kind::Trailers => write!(f, "trailer"),
-            Kind::Intros => write!(f, "intro"),
-            Kind::Outros => write!(f, "outro"),
-            Kind::Soundtracks => write!(f, "soundtrack"),
-            Kind::BehindTheScenes => write!(f, "behind the scenes"),
-            Kind::DeletedScenes => write!(f, "deleted scene"),
-            Kind::Interviews => write!(f, "interview"),
-            Kind::Scenes => write!(f, "scene"),
-            Kind::Samples => write!(f, "sample"),
-            Kind::Shorts => write!(f, "short"),
-            Kind::Featurettes => write!(f, "featurette"),
-            Kind::Clips => write!(f, "clip"),
-        }
-    }
-}
-
-impl ThreeD {
-    fn arr() -> Vec<Self> {
-        vec![Self::Htab, Self::Mvc, Self::Hsbs, Self::Ftab, Self::Fsbs]
-    }
-}
-
-impl TryFrom<String> for Kind {
-    type Error = ();
-
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.as_str() {
-            "trailer" => Ok(Kind::Trailers),
-            "intro" => Ok(Kind::Intros),
-            "outro" => Ok(Kind::Outros),
-            "soundtrack" => Ok(Kind::Soundtracks),
-            "behind the scenes" => Ok(Kind::BehindTheScenes),
-            "deleted scene" => Ok(Kind::DeletedScenes),
-            "interview" => Ok(Kind::Interviews),
-            "scene" => Ok(Kind::Scenes),
-            "sample" => Ok(Kind::Samples),
-            "short" => Ok(Kind::Shorts),
-            "featurette" => Ok(Kind::Featurettes),
-            "clip" => Ok(Kind::Clips),
-            _ => Err(()),
-        }
     }
 }
 
@@ -319,78 +164,12 @@ fn get_valid_files(p: &Path) -> Vec<DirEntry> {
         .collect::<Vec<_>>()
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Resolutions {
-    pub width: Option<u32>,
-    pub height: u32,
-}
-
-impl Resolutions {
-    fn from_str(input: &str) -> Option<(Self, String)> {
-        let pattern_str = format!(
-            r"(?i)(?P<width>\d+)\s*({})\s*(?P<height>{})",
-            Self::join().join("|"),
-            Self::heights()
-                .iter()
-                .map(|&h| h.to_string())
-                .collect::<Vec<String>>()
-                .join("|")
-        );
-        let regex = Regex::new(&pattern_str).unwrap();
-
-        if let Some(captures) = regex.captures(input) {
-            let width = captures["width"].parse::<u32>().unwrap();
-            let height = captures["height"].parse::<u32>().unwrap();
-            let leftover_str = regex.replace(input, "").to_string();
-            return Some((
-                Self {
-                    width: Some(width),
-                    height,
-                },
-                leftover_str,
-            ));
-        }
-
-        let resolutions = Self::heights();
-        for resolution in resolutions {
-            if input.contains(&format!("{}p", resolution)) {
-                let modified_input = input.replace(&format!("{}p", resolution), "");
-
-                return Some((
-                    Self {
-                        width: None,
-                        height: resolution,
-                    },
-                    modified_input,
-                ));
-            }
-        }
-
-        None
-    }
-    fn heights() -> Vec<u32> {
-        vec![240, 360, 480, 540, 720, 1080, 1440, 2160, 4320]
-    }
-
-    fn join() -> Vec<&'static str> {
-        vec!["x", " x ", "×", " × "]
-    }
-}
-
 fn get_lang(s: &str) -> Option<&str> {
     if s.len() < 4 {
         return None;
     }
     let sub = &s[s.len() - 4..];
     sub.strip_prefix("-")
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub enum Episode {
-    List(Vec<f64>),
-    Single(f64),
-    Part(f64, u32),
-    Range(RangeInclusive<u32>),
 }
 
 fn get_next_episode(mut s: String, float: bool, value: f64) -> (Episode, String) {
@@ -633,30 +412,6 @@ fn parse_episodes(
     }
     ret
 }
-
-fn suffixes(mut s: String, mut suff: Vec<String>) -> (String, Vec<String>) {
-    let mut other = ThreeD::arr()
-        .iter()
-        .map(|v| v.to_string())
-        .collect::<Vec<_>>();
-    other.append(&mut Kind::arr().iter().map(|v| v.to_string()).collect());
-    other.append(&mut Cut::arr().iter().map(|v| v.to_string()).collect());
-    let mut found = false;
-    for other in other {
-        s = s.trim().to_string();
-        if let Some(v) = s.strip_suffix(&other) {
-            found = true;
-            suff.push(other);
-            s = v.trim().to_string();
-        }
-    }
-    if found {
-        suffixes(s, suff)
-    } else {
-        (s, suff)
-    }
-}
-
 fn parse_movie(p: &Path) -> MovieResult {
     todo!()
 }

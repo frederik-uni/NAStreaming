@@ -1,10 +1,11 @@
 mod episode_guessing;
 mod parser;
 mod reg;
-mod typ;
+mod resolution;
+mod segments;
+mod suffixes;
 
 pub use parser::parse_library;
-//TODO: refactor
 
 #[cfg(test)]
 mod tests {
@@ -16,7 +17,7 @@ mod tests {
     fn test() {
         let path: PathBuf = "/Volumes/NAStreaming/Anime".into();
         //ffmpeg_next::init().expect("TODO: panic message");
-        let v = parse_library(&path, true, &[], false).expect("TODO: panic message");
+        let v = parse_library(&path, &vec![]);
         println!("{}", v.len());
     }
 }

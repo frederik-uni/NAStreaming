@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq, Hash)]
 pub enum FileType {
     Video(VideoExtension),
     Subtitle {
@@ -31,6 +31,8 @@ impl<'a> TryFrom<&'a str> for FileType {
     type Error = ();
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
+        let value = value.to_lowercase();
+        let value = value.as_str();
         if let Ok(v) = VideoExtension::try_from(value) {
             return Ok(Self::Video(v));
         } else if let Ok(v) = SubtitleExtension::try_from(value) {
@@ -48,7 +50,7 @@ impl<'a> TryFrom<&'a str> for FileType {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq, Hash)]
 pub enum VideoExtension {
     ThreeGP,
     Asf,
@@ -73,42 +75,42 @@ impl<'a> TryFrom<&'a str> for VideoExtension {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let value = value.to_lowercase();
-        if value.ends_with(".3gp") {
+        if value == "3gp" {
             return Ok(Self::ThreeGP);
-        } else if value.ends_with(".asf") || value.ends_with(".wmv") {
+        } else if value == "asf" || value == "wmv" {
             return Ok(Self::Asf);
-        } else if value.ends_with(".avi") {
+        } else if value == "avi" {
             return Ok(Self::Avi);
-        } else if value.ends_with(".flv") {
+        } else if value == "flv" {
             return Ok(Self::Flv);
-        } else if value.ends_with(".mov") {
+        } else if value == "mov" {
             return Ok(Self::Mov);
-        } else if value.ends_with(".mp4") {
+        } else if value == "mp4" {
             return Ok(Self::MP4);
-        } else if value.ends_with(".ogm") {
+        } else if value == "ogm" {
             return Ok(Self::Ogg);
-        } else if value.ends_with(".mpg") || value.ends_with(".ts") {
+        } else if value == "mpg" || value == "ts" {
             return Ok(Self::TS);
-        } else if value.ends_with(".nsc") {
+        } else if value == "nsc" {
             return Ok(Self::Nsc);
-        } else if value.ends_with(".nsv") {
+        } else if value == "nsv" {
             return Ok(Self::Nsv);
-        } else if value.ends_with(".mkv") {
+        } else if value == "mkv" {
             return Ok(Self::Mkv);
-        } else if value.ends_with(".nut") {
+        } else if value == "nut" {
             return Ok(Self::Nut);
-        } else if value.ends_with(".rm") || value.ends_with(".rv") || value.ends_with(".rmbv") {
+        } else if value == "rm" || value == "rv" || value == "rmbv" {
             return Ok(Self::Real);
-        } else if value.ends_with(".a52") || value.ends_with(".dv") || value.ends_with(".vid") {
+        } else if value == "a52" || value == "dv" || value == "vid" {
             return Ok(Self::Raw);
-        } else if value.ends_with(".ty") {
+        } else if value == "ty" {
             return Ok(Self::TyTivo);
         }
         Err(())
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq, Hash)]
 pub enum SubtitleExtension {
     /// SRT
     SubRip,
@@ -134,44 +136,44 @@ impl<'a> TryFrom<&'a str> for SubtitleExtension {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let value = value.to_lowercase();
-        if value.ends_with(".aqt") {
+        if value == "aqt" {
             return Ok(Self::AQTitle);
-        } else if value.ends_with(".cvd") {
+        } else if value == "cvd" {
             return Ok(Self::Cvd);
-        } else if value.ends_with(".dks") {
+        } else if value == "dks" {
             return Ok(Self::Dks);
-        } else if value.ends_with(".jss") {
+        } else if value == "jss" {
             return Ok(Self::JACOsub);
-        } else if value.ends_with(".sub") {
+        } else if value == "sub" {
             return Ok(Self::MicroDVD);
-        } else if value.ends_with(".ttxt") {
+        } else if value == "ttxt" {
             return Ok(Self::MPEG4TimedText);
-        } else if value.ends_with(".mpl") {
+        } else if value == "mpl" {
             return Ok(Self::MPL2);
-        } else if value.ends_with(".pjs") {
+        } else if value == "pjs" {
             return Ok(Self::PhoenixSubtitle);
-        } else if value.ends_with(".rt") {
+        } else if value == "rt" {
             return Ok(Self::RealText);
-        } else if value.ends_with(".smi") {
+        } else if value == "smi" {
             return Ok(Self::Sami);
-        } else if value.ends_with(".ssf") {
+        } else if value == "ssf" {
             return Ok(Self::StructuredSubtitleFormat);
-        } else if value.ends_with(".ssa") || value.ends_with(".ass") {
+        } else if value == "ssa" || value == "ass" {
             return Ok(Self::SubStationAlpha);
-        } else if value.ends_with(".svcd") {
+        } else if value == "svcd" {
             return Ok(Self::SVCDsubtitles);
-        } else if value.ends_with(".usf") {
+        } else if value == "usf" {
             return Ok(Self::UniversalSubtitle);
-        } else if value.ends_with(".sub") || value.ends_with(".idx") {
+        } else if value == "sub" || value == "idx" {
             return Ok(Self::VobSub);
-        } else if value.ends_with(".srt") {
+        } else if value == "srt" {
             return Ok(Self::SubRip);
         }
         Err(())
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq, Hash)]
 pub enum AudioExtension {
     Mka,
     MP3,
@@ -191,27 +193,27 @@ impl<'a> TryFrom<&'a str> for AudioExtension {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let value = value.to_lowercase();
-        if value.ends_with(".ra") || value.ends_with(".ram") {
+        if value == "ra" || value == "ram" {
             return Ok(Self::RA);
-        } else if value.ends_with(".tta") || value.ends_with(".tac") {
+        } else if value == "tta" || value == "tac" {
             return Ok(Self::TrueAudioCodec);
-        } else if value.ends_with(".xa") {
+        } else if value == "xa" {
             return Ok(Self::Xa);
-        } else if value.ends_with(".wav") || value.ends_with(".dts") {
+        } else if value == "wav" || value == "dts" {
             return Ok(Self::Wav);
-        } else if value.ends_with(".au") {
+        } else if value == "au" {
             return Ok(Self::AU);
-        } else if value.ends_with(".aac") {
+        } else if value == "aac" {
             return Ok(Self::Aac);
-        } else if value.ends_with(".ogg") {
+        } else if value == "ogg" {
             return Ok(Self::Ogg);
-        } else if value.ends_with(".m4a") {
+        } else if value == "m4a" {
             return Ok(Self::M4A);
-        } else if value.ends_with(".flac") {
+        } else if value == "flac" {
             return Ok(Self::Flac);
-        } else if value.ends_with(".mp3") {
+        } else if value == "mp3" {
             return Ok(Self::MP3);
-        } else if value.ends_with(".mka") {
+        } else if value == "mka" {
             return Ok(Self::Mka);
         }
         Err(())

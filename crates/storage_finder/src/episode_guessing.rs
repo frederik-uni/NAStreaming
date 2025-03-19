@@ -1,13 +1,21 @@
 use regex::Regex;
 
-pub fn episode_guess(s: String) -> (Option<i32>, Option<i32>) {
-    let func = vec![extract_season_episode_dash, extract_season_string_episode_dash];
+pub fn episode_guess(s: &str) -> (Option<i32>, Option<i32>) {
+    let func = vec![
+        extract_season_episode_dash,
+        extract_season_string_episode_dash,
+    ];
     for func in func {
         if let Some((s, e)) = func(&s.to_lowercase()) {
             return (Some(s), Some(e));
         }
     }
-    let func_epi_only = vec![exract_ep, extract_episode_string, extract_episode_dash_underscore, extract_episode_dash];
+    let func_epi_only = vec![
+        exract_ep,
+        extract_episode_string,
+        extract_episode_dash_underscore,
+        extract_episode_dash,
+    ];
     for func in func_epi_only {
         if let Some(e) = func(&s.to_lowercase()) {
             return (None, Some(e));
