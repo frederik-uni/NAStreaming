@@ -60,8 +60,8 @@ fn parsed_to_entry(mut data: Parsed) -> Entry {
         }
     }
     Entry {
-        name: data.name,
-        ep_name: data.ep_name,
+        name: data.name.into_iter().filter(|v| !v.is_empty()).collect(),
+        ep_name: data.ep_name.into_iter().filter(|v| !v.is_empty()).collect(),
         season: data.season,
         episode: data.episode,
         file_type: data.file_type.unwrap(),

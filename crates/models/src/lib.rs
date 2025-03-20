@@ -1,11 +1,11 @@
 pub mod episodes;
 pub mod file_group;
 pub mod files;
-pub mod index_data;
 pub mod lists;
 pub mod metadata;
 pub mod progress;
 pub mod scan_groups;
+mod user;
 
 use std::sync::LazyLock;
 use surrealdb::engine::remote::ws::{Client, Ws};

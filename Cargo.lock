@@ -64,7 +64,7 @@ dependencies = [
  "flate2",
  "foldhash",
  "futures-core",
- "h2",
+ "h2 0.3.26",
  "http 0.2.12",
  "httparse",
  "httpdate",
@@ -368,38 +368,65 @@ dependencies = [
 [[package]]
 name = "anemyfr"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "anidb"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "anilist"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "anime-characters-database"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "anime-news-network"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "anime-planet"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "animecountdown"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "animedb-jp"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "anisearch"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "anstream"
@@ -818,6 +845,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "atomic-waker"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
+
+[[package]]
 name = "autocfg"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -867,6 +900,13 @@ dependencies = [
  "getrandom 0.2.15",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "becausemoe"
+version = "0.1.0"
+dependencies = [
+ "metadata-provider",
 ]
 
 [[package]]
@@ -1295,6 +1335,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "core-foundation"
+version = "0.9.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "91e195e091a93c46f7102ec7818a2aa394e1e1771c3ab4825963fa03e45afb8f"
+dependencies = [
+ "core-foundation-sys",
+ "libc",
+]
+
+[[package]]
 name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1545,6 +1595,9 @@ checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 [[package]]
 name = "duckduckgo"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "dyn-clone"
@@ -1668,10 +1721,16 @@ dependencies = [
 [[package]]
 name = "fanart-tv"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "fandom"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "fastrand"
@@ -1748,6 +1807,21 @@ name = "foldhash"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0d2fde1f7b3d48b8395d5f2de76c18a528bd6a9cdde438df747bfcba3e05d6f"
+
+[[package]]
+name = "foreign-types"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1"
+dependencies = [
+ "foreign-types-shared",
+]
+
+[[package]]
+name = "foreign-types-shared"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 
 [[package]]
 name = "form_urlencoded"
@@ -1916,6 +1990,9 @@ dependencies = [
 [[package]]
 name = "gamdb"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "generic-array"
@@ -2018,6 +2095,25 @@ dependencies = [
  "futures-sink",
  "futures-util",
  "http 0.2.12",
+ "indexmap 2.8.0",
+ "slab",
+ "tokio",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
+name = "h2"
+version = "0.4.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5017294ff4bb30944501348f6f8e42e6ad28f42c8bbef7a74029aff064a4e3c2"
+dependencies = [
+ "atomic-waker",
+ "bytes",
+ "fnv",
+ "futures-core",
+ "futures-sink",
+ "http 1.3.1",
  "indexmap 2.8.0",
  "slab",
  "tokio",
@@ -2212,6 +2308,7 @@ dependencies = [
  "bytes",
  "futures-channel",
  "futures-util",
+ "h2 0.4.8",
  "http 1.3.1",
  "http-body",
  "httparse",
@@ -2238,6 +2335,22 @@ dependencies = [
  "tokio-rustls",
  "tower-service",
  "webpki-roots",
+]
+
+[[package]]
+name = "hyper-tls"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70206fc6890eaca9fde8a0bf71caa2ddfc9fe045ac9e5c70df101a7dbde866e0"
+dependencies = [
+ "bytes",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "native-tls",
+ "tokio",
+ "tokio-native-tls",
+ "tower-service",
 ]
 
 [[package]]
@@ -2430,6 +2543,9 @@ dependencies = [
 [[package]]
 name = "imdb"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "impl-more"
@@ -2484,10 +2600,6 @@ dependencies = [
  "libc",
  "windows-sys 0.59.0",
 ]
-
-[[package]]
-name = "is-this-dubbed"
-version = "0.1.0"
 
 [[package]]
 name = "is_terminal_polyfill"
@@ -2589,6 +2701,9 @@ dependencies = [
 [[package]]
 name = "kitsu"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "lalrpop"
@@ -2701,6 +2816,9 @@ checksum = "23fb14cb19457329c82206317a5663005a4d404783dc74f4252769b0d5f42856"
 [[package]]
 name = "livechart"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "local-channel"
@@ -2794,6 +2912,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
+name = "metadata-provider"
+version = "0.1.0"
+
+[[package]]
 name = "miette"
 version = "5.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2864,6 +2986,7 @@ name = "models"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "storage-finder",
  "structures",
  "surrealdb",
 ]
@@ -2888,6 +3011,9 @@ dependencies = [
 [[package]]
 name = "myanimelist"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "nanoid"
@@ -2896,6 +3022,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ffa00dec017b5b1a8b7cf5e2c008bfda1aa7e0697ac1508b491fdf2622fb4d8"
 dependencies = [
  "rand 0.8.5",
+]
+
+[[package]]
+name = "native-tls"
+version = "0.2.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "87de3442987e9dbec73158d5c715e7ad9072fda936bb03d19d7fa10e00520f0e"
+dependencies = [
+ "libc",
+ "log",
+ "openssl",
+ "openssl-probe",
+ "openssl-sys",
+ "schannel",
+ "security-framework",
+ "security-framework-sys",
+ "tempfile",
 ]
 
 [[package]]
@@ -2976,6 +3119,9 @@ dependencies = [
 [[package]]
 name = "notify-moe"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "ntapi"
@@ -3075,6 +3221,50 @@ name = "once_cell"
 version = "1.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d75b0bedcc4fe52caa0e03d9f1151a323e4aa5e2d78ba3580400cd3c9e2bc4bc"
+
+[[package]]
+name = "openssl"
+version = "0.10.71"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e14130c6a98cd258fdcb0fb6d744152343ff729cbfcb28c656a9d12b999fbcd"
+dependencies = [
+ "bitflags",
+ "cfg-if",
+ "foreign-types",
+ "libc",
+ "once_cell",
+ "openssl-macros",
+ "openssl-sys",
+]
+
+[[package]]
+name = "openssl-macros"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
+]
+
+[[package]]
+name = "openssl-probe"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d05e27ee213611ffe7d6348b942e8f942b37114c00cc03cec254295a4a17852e"
+
+[[package]]
+name = "openssl-sys"
+version = "0.9.106"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8bb61ea9811cc39e3c2069f40b8b8e2e70d8569b361f879786cc7ed48b777cdd"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
+ "vcpkg",
+]
 
 [[package]]
 name = "option-ext"
@@ -3585,6 +3775,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "randomanime"
+version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
+
+[[package]]
 name = "rawpointer"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3728,19 +3925,24 @@ checksum = "d19c46a6fdd48bc4dab94b6103fccc55d34c67cc0ad04653aad4ea2a07cd7bbb"
 dependencies = [
  "base64 0.22.1",
  "bytes",
+ "encoding_rs",
+ "futures-channel",
  "futures-core",
  "futures-util",
+ "h2 0.4.8",
  "http 1.3.1",
  "http-body",
  "http-body-util",
  "hyper",
  "hyper-rustls",
+ "hyper-tls",
  "hyper-util",
  "ipnet",
  "js-sys",
  "log",
  "mime",
  "mime_guess",
+ "native-tls",
  "once_cell",
  "percent-encoding",
  "pin-project-lite",
@@ -3752,7 +3954,9 @@ dependencies = [
  "serde_json",
  "serde_urlencoded",
  "sync_wrapper",
+ "system-configuration",
  "tokio",
+ "tokio-native-tls",
  "tokio-rustls",
  "tokio-util",
  "tower",
@@ -3876,6 +4080,9 @@ checksum = "cbf4a6aa5f6d6888f39e980649f3ad6b666acdce1d78e95b8a2cb076e687ae30"
 [[package]]
 name = "rottentomatoes"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "rstar"
@@ -4038,6 +4245,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "schannel"
+version = "0.1.27"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f29ebaa345f945cec9fbbc532eb307f0fdad8161f281b6369539c8d84876b3d"
+dependencies = [
+ "windows-sys 0.59.0",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4060,6 +4276,29 @@ name = "seahash"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
+
+[[package]]
+name = "security-framework"
+version = "2.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "897b2245f0b511c87893af39b033e5ca9cce68824c4d7e7630b5a1d339658d02"
+dependencies = [
+ "bitflags",
+ "core-foundation",
+ "core-foundation-sys",
+ "libc",
+ "security-framework-sys",
+]
+
+[[package]]
+name = "security-framework-sys"
+version = "2.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "49db231d56a190491cb4aeda9527f1ad45345af50b0851622a7adb8c03b01c32"
+dependencies = [
+ "core-foundation-sys",
+ "libc",
+]
 
 [[package]]
 name = "semver"
@@ -4235,6 +4474,9 @@ checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
 [[package]]
 name = "simkl"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "simple_asn1"
@@ -4366,7 +4608,6 @@ dependencies = [
  "bigdecimal",
  "regex",
  "serde",
- "walkdir",
 ]
 
 [[package]]
@@ -4634,6 +4875,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "system-configuration"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c879d448e9d986b661742763247d3693ed13609438cf3d006f51f5368a5ba6b"
+dependencies = [
+ "bitflags",
+ "core-foundation",
+ "system-configuration-sys",
+]
+
+[[package]]
+name = "system-configuration-sys"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e1d1b10ced5ca923a1fcb8d03e96b8d3268065d724548c0211415ff6ac6bac4"
+dependencies = [
+ "core-foundation-sys",
+ "libc",
+]
+
+[[package]]
 name = "tap"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4686,10 +4948,19 @@ dependencies = [
 [[package]]
 name = "themoviedb"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "thetvdb"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+ "reqwest",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "thiserror"
@@ -4836,6 +5107,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-native-tls"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbae76ab933c85776efabc971569dd6119c580d8f5d448769dec1764bf796ef2"
+dependencies = [
+ "native-tls",
+ "tokio",
+]
+
+[[package]]
 name = "tokio-rustls"
 version = "0.26.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4971,6 +5252,9 @@ dependencies = [
 [[package]]
 name = "trakt"
 version = "0.1.0"
+dependencies = [
+ "metadata-provider",
+]
 
 [[package]]
 name = "trice"

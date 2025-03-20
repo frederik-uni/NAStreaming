@@ -30,10 +30,6 @@ async fn main() {
     }
 
     for (path, _) in scan {
-        let items = storage_finder::parse_library(&path, &vec![]);
-        File::create("temp.json")
-            .unwrap()
-            .write_all(serde_json::to_string(&items).unwrap().as_bytes())
-            .unwrap()
+        let items = storage_finder::parse_library(&path, &Default::default());
     }
 }

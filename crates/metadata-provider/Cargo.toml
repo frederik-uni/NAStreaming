@@ -1,5 +1,5 @@
 [package]
-name = "is-this-dubbed"
+name = "metadata-provider"
 version.workspace = true
 edition.workspace = true
 

@@ -9,11 +9,11 @@ impl MetadataProvider for Instance {
         Ok(Box::new(Self {}))
     }
     fn id() -> &'static str {
-        "animecountdown"
+        "becausemoe"
     }
 
     fn name(&self) -> &'static str {
-        "Anime Countdown"
+        "because.moe"
     }
 
     fn state(&self) -> metadata_provider::State {
@@ -21,7 +21,7 @@ impl MetadataProvider for Instance {
     }
 
     fn origin(&self) -> &'static str {
-        "https://animecountdown.com"
+        "https://because.moe"
     }
 
     fn search(&self) -> Option<Box<dyn metadata_provider::SearchProvider>> {

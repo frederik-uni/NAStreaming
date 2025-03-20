@@ -6,6 +6,12 @@ mod segments;
 mod suffixes;
 
 pub use parser::parse_library;
+pub use resolution::Resolutions;
+pub use segments::Episode;
+pub use suffixes::Cut;
+pub use suffixes::FileType;
+pub use suffixes::Kind;
+pub use suffixes::ThreeD;
 
 #[cfg(test)]
 mod tests {
@@ -16,8 +22,7 @@ mod tests {
     #[test]
     fn test() {
         let path: PathBuf = "/Volumes/NAStreaming/Anime".into();
-        //ffmpeg_next::init().expect("TODO: panic message");
-        let v = parse_library(&path, &vec![]);
+        let v = parse_library(&path, &Default::default());
         println!("{}", v.len());
     }
 }

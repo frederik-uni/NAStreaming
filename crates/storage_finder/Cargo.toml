@@ -6,7 +6,6 @@ edition = { workspace = true }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-walkdir = { workspace=true }
 regex = {  workspace=true }
 serde = { workspace=true, features = ["derive"] }
 bigdecimal = {version = "0.4.7", features = ["serde"]}
