@@ -1,8 +1,9 @@
+mod info;
 mod search;
 
 use std::collections::HashMap;
 
-use metadata_provider::{fetcher::Client, MetadataProvider};
+use metadata_provider::{fetcher::Client, Issue, MetadataProvider};
 
 pub struct Instance {
     client: Client,
@@ -20,6 +21,10 @@ impl MetadataProvider for Instance {
 
     fn name(&self) -> &'static str {
         "AniList"
+    }
+
+    fn issues(&self) -> Vec<Issue> {
+        vec![Issue::SeasonsAreSeperateEntries]
     }
 
     fn state(&self) -> metadata_provider::State {
@@ -58,5 +63,11 @@ mod tests {
             .expect("Test failed");
 
         println!("{:#?}", result);
+    }
+
+    #[test]
+    fn lookup() {
+        let instance = Instance::new(Default::default()).expect("unreachable");
+        instance.lookup("176301");
     }
 }

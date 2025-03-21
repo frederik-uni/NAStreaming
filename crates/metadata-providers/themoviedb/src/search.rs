@@ -45,7 +45,11 @@ impl SearchProvider for Instance {
             .results
             .into_iter()
             .map(|v| SearchResult {
-                id: v.id.to_string(),
+                id: format!(
+                    "{}-{}",
+                    v.media_type.as_ref().unwrap_or(&kind.to_owned()),
+                    v.id
+                ),
                 names: match v.original_title {
                     Some(original_title) => vec![v.title, original_title],
                     None => vec![v.title],

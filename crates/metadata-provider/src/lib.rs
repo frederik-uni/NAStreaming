@@ -22,6 +22,7 @@ pub enum DataRetrievel {
 pub enum Error {
     Reqwest(::reqwest::Error),
     NodeNotFound,
+    InvalidId,
 }
 
 impl From<::reqwest::Error> for Error {
@@ -30,6 +31,9 @@ impl From<::reqwest::Error> for Error {
     }
 }
 
+pub enum Issue {
+    SeasonsAreSeperateEntries,
+}
 pub trait MetadataProvider {
     /// Init instance
     fn new(data: HashMap<String, String>) -> Result<Box<Self>, String>;
@@ -44,6 +48,10 @@ pub trait MetadataProvider {
 
     fn data_retrievel(&self) -> DataRetrievel {
         DataRetrievel::Unknown
+    }
+
+    fn issues(&self) -> Vec<Issue> {
+        vec![]
     }
     /// Original site
     fn origin(&self) -> &'static str;

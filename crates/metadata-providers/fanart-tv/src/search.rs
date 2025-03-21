@@ -32,7 +32,7 @@ impl SearchProvider for Instance {
         Ok(data
             .into_iter()
             .map(|v| SearchResult {
-                id: v.id,
+                id: format!("{}-{}", v.r#type, v.id),
                 names: vec![v.title],
                 overview: None,
                 cover: v.poster,

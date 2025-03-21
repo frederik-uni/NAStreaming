@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use metadata_provider::search::{Capabilities, SearchProvider, SearchResult};
-use reqwest::header::AUTHORIZATION;
+use metadata_provider::{
+    fetcher::reqwest::header::AUTHORIZATION,
+    search::{Capabilities, SearchProvider, SearchResult},
+};
 use serde::Deserialize;
 
 use crate::Instance;

@@ -1,7 +1,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use base64::{engine::general_purpose::STANDARD, Engine as _};
-use reqwest::Error;
+use metadata_provider::Error;
 use serde::Deserialize;
 use serde_json::json;
 

@@ -1,3 +1,4 @@
+mod info;
 pub mod search;
 
 use std::collections::HashMap;

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use metadata_provider::{
     fetcher::{Client, Url},
-    MetadataProvider,
+    Issue, MetadataProvider,
 };
 use scraper::Selector;
 
@@ -56,6 +56,10 @@ impl MetadataProvider for Instance {
 
     fn name(&self) -> &'static str {
         "AniDB"
+    }
+
+    fn issues(&self) -> Vec<Issue> {
+        vec![Issue::SeasonsAreSeperateEntries]
     }
 
     fn id_to_url(&self, id: &str) -> String {

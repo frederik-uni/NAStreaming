@@ -1,15 +1,16 @@
+use metadata_provider::Error;
 use serde::Deserialize;
 
 use crate::Instance;
 
 impl Instance {
-    pub fn lookup(&self, id: &str) {
+    pub fn lookup(&self, id: &str) -> Result<Anime, Error> {
         let mut url = self.server.clone();
         url.query_pairs_mut().append_pair("aid", id);
         let text = self.client.get(url).send().unwrap().text().unwrap();
 
         let data: Anime = quick_xml::de::from_str(text.as_str()).unwrap();
-        println!("{data:#?}")
+        Ok(data)
     }
 }
 

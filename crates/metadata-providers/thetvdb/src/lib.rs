@@ -1,3 +1,4 @@
+mod info;
 mod login;
 mod search;
 
@@ -6,8 +7,10 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use metadata_provider::MetadataProvider;
-use reqwest::{blocking::Client, Url};
+use metadata_provider::{
+    fetcher::{Client, Url},
+    MetadataProvider,
+};
 
 pub struct Instance {
     pub key: String,
@@ -48,6 +51,10 @@ impl MetadataProvider for Instance {
 
     fn id_to_url(&self, id: &str) -> String {
         format!("https://thetvdb.com/dereferrer/series/{id}")
+    }
+
+    fn data_retrievel(&self) -> metadata_provider::DataRetrievel {
+        metadata_provider::DataRetrievel::Api
     }
 
     fn search(&self) -> Option<&dyn metadata_provider::search::SearchProvider> {
