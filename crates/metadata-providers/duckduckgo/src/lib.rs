@@ -24,7 +24,11 @@ impl MetadataProvider for Instance {
         "https://duckduckgo.com"
     }
 
-    fn search(&self) -> Option<Box<dyn metadata_provider::SearchProvider>> {
+    fn id_to_url(&self, id: &str) -> String {
+        id.to_owned()
+    }
+
+    fn search(&self) -> Option<&dyn metadata_provider::search::SearchProvider> {
         None
     }
 

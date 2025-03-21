@@ -4,3 +4,8 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+reqwest = {version="0.12", features = ["json", "blocking", "gzip"]}
+http = "1.3"
+bytes = "1.10"
+scraper.workspace = true
+serde.workspace = true

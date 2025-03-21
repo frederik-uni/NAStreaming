@@ -24,11 +24,15 @@ impl MetadataProvider for Instance {
         "https://anemy.fr"
     }
 
-    fn search(&self) -> Option<Box<dyn metadata_provider::SearchProvider>> {
+    fn search(&self) -> Option<&dyn metadata_provider::search::SearchProvider> {
         None
     }
 
     fn info(&self) -> Option<Box<dyn metadata_provider::InfoProvider>> {
         None
+    }
+
+    fn id_to_url(&self, id: &str) -> String {
+        format!("https://anemy.fr/anime.php?id={id}")
     }
 }

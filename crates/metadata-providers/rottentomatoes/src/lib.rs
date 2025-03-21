@@ -24,7 +24,12 @@ impl MetadataProvider for Instance {
         "https://www.rottentomatoes.com"
     }
 
-    fn search(&self) -> Option<Box<dyn metadata_provider::SearchProvider>> {
+    fn id_to_url(&self, id: &str) -> String {
+        let (kind, id) = id.split_once("-").unwrap_or_default();
+        format!("https://www.rottentomatoes.com/{kind}/{id}")
+    }
+
+    fn search(&self) -> Option<&dyn metadata_provider::search::SearchProvider> {
         None
     }
 

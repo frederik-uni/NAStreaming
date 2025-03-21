@@ -24,7 +24,11 @@ impl MetadataProvider for Instance {
         "https://because.moe"
     }
 
-    fn search(&self) -> Option<Box<dyn metadata_provider::SearchProvider>> {
+    fn id_to_url(&self, _id: &str) -> String {
+        "https://because.moe".to_owned()
+    }
+
+    fn search(&self) -> Option<&dyn metadata_provider::search::SearchProvider> {
         None
     }
 

@@ -5,3 +5,7 @@ edition.workspace = true
 
 [dependencies]
 metadata-provider = {workspace = true}
+serde = {workspace = true, features = ["derive"]}
+quick-xml = {version = "0.37.2", features = ["serialize"]}
+urlencoding.workspace = true
+scraper.workspace = true

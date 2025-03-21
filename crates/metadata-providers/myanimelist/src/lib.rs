@@ -24,7 +24,11 @@ impl MetadataProvider for Instance {
         "https://myanimelist.net/topanime.php"
     }
 
-    fn search(&self) -> Option<Box<dyn metadata_provider::SearchProvider>> {
+    fn id_to_url(&self, id: &str) -> String {
+        format!("https://myanimelist.net/anime/{id}")
+    }
+
+    fn search(&self) -> Option<&dyn metadata_provider::search::SearchProvider> {
         None
     }
 

@@ -17,14 +17,18 @@ impl MetadataProvider for Instance {
     }
 
     fn state(&self) -> metadata_provider::State {
-        metadata_provider::State::Planed
+        metadata_provider::State::WIP
     }
 
     fn origin(&self) -> &'static str {
         "https://kitsu.app/explore/anime"
     }
 
-    fn search(&self) -> Option<Box<dyn metadata_provider::SearchProvider>> {
+    fn id_to_url(&self, id: &str) -> String {
+        format!("https://kitsu.app/anime/{id}")
+    }
+
+    fn search(&self) -> Option<&dyn metadata_provider::search::SearchProvider> {
         None
     }
 
