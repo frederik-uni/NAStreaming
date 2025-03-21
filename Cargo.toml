@@ -22,6 +22,6 @@ metadata-provider = { path = "crates/metadata-provider" }
 urlencoding = "2.1"
 scraper = "0.23"
 regex = "1"
-
+base64 = "0.22.1"
 schemars = { package = "apistos-schemars", version = "0.8" }
 apistos = "0.4"
