@@ -14,6 +14,8 @@ pub enum DataRetrievel {
     Unknown,
     Scraping,
     Api,
+    SearchInternalApiInfoApi,
+    SearchScraperInfoApi,
 }
 
 #[derive(Debug)]

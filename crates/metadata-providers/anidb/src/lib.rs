@@ -66,6 +66,10 @@ impl MetadataProvider for Instance {
         metadata_provider::State::WIP
     }
 
+    fn data_retrievel(&self) -> metadata_provider::DataRetrievel {
+        metadata_provider::DataRetrievel::SearchScraperInfoApi
+    }
+
     fn origin(&self) -> &'static str {
         "https://anidb.net"
     }

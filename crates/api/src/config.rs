@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     fs::{read_to_string, File},
     io::Write as _,
     path::Path,
@@ -12,23 +13,8 @@ use crate::error::{StartUpError, StartUpResult};
 pub struct Config {
     pub server: Server,
     pub logging: Logging,
-    #[serde(rename = "tv-db")]
-    pub tv_db: TvDB,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct TvDB {
-    pub pin: Option<String>,
-    pub key: String,
-}
-
-impl Default for TvDB {
-    fn default() -> Self {
-        Self {
-            pin: None,
-            key: "82945bab-429b-45cf-ab96-3a085a561599".to_owned(),
-        }
-    }
+    #[serde(flatten)]
+    pub others: HashMap<String, HashMap<String, String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

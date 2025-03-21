@@ -19,7 +19,6 @@ structures = { path = "crates/structures" }
 models = { path = "crates/models" }
 storage-finder = { path = "crates/storage_finder" }
 metadata-provider = { path = "crates/metadata-provider" }
-urlencoding = "2.1"
 scraper = "0.23"
 regex = "1"
 base64 = "0.22.1"

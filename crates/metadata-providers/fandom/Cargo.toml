@@ -6,4 +6,3 @@ edition.workspace = true
 [dependencies]
 metadata-provider.workspace = true
 scraper.workspace = true
-urlencoding.workspace = true

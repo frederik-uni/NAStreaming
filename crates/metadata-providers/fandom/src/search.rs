@@ -13,12 +13,10 @@ impl SearchProvider for Instance {
         _year: Option<u16>,
         _series: Option<bool>,
     ) -> Result<Vec<SearchResult>, Error> {
-        let url: Url = format!(
-            "https://community.fandom.com/wiki/Special:SearchCommunity?query={}",
-            urlencoding::encode(query)
-        )
-        .parse()
-        .expect("url shouldnt fail");
+        let mut url: Url = "https://community.fandom.com/wiki/Special:SearchCommunity"
+            .parse()
+            .expect("url shouldnt fail");
+        url.query_pairs_mut().append_pair("query", query);
         let req = self.client.get(url).send()?;
         let document = req.html()?;
         let data = document

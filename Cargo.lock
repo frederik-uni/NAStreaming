@@ -380,7 +380,6 @@ dependencies = [
  "quick-xml",
  "scraper",
  "serde",
- "urlencoding",
 ]
 
 [[package]]
@@ -388,6 +387,8 @@ name = "anilist"
 version = "0.1.0"
 dependencies = [
  "metadata-provider",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1784,6 +1785,8 @@ name = "fanart-tv"
 version = "0.1.0"
 dependencies = [
  "metadata-provider",
+ "serde",
+ "toml",
 ]
 
 [[package]]
@@ -1792,7 +1795,6 @@ version = "0.1.0"
 dependencies = [
  "metadata-provider",
  "scraper",
- "urlencoding",
 ]
 
 [[package]]
@@ -2796,6 +2798,7 @@ name = "kitsu"
 version = "0.1.0"
 dependencies = [
  "metadata-provider",
+ "serde",
 ]
 
 [[package]]
@@ -5129,16 +5132,20 @@ name = "themoviedb"
 version = "0.1.0"
 dependencies = [
  "metadata-provider",
+ "serde",
+ "toml",
 ]
 
 [[package]]
 name = "thetvdb"
 version = "0.1.0"
 dependencies = [
+ "base64 0.22.1",
  "metadata-provider",
  "reqwest",
  "serde",
  "serde_json",
+ "toml",
 ]
 
 [[package]]

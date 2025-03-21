@@ -13,16 +13,15 @@ impl SearchProvider for Instance {
         year: Option<u16>,
         _series: Option<bool>,
     ) -> Result<Vec<SearchResult>, Error> {
-        let year = year
-            .map(|year| format!("&season.year={year}"))
-            .unwrap_or_default();
-
-        let url = Url::parse(&format!(
-            "https://anidb.net/anime/?adb.search={}&noalias=1&do.update=Search{}",
-            urlencoding::encode(query),
-            year,
-        ))
-        .expect("url shouldnt fail");
+        let mut url = Url::parse("https://anidb.net/anime/").expect("url shouldnt fail");
+        url.query_pairs_mut()
+            .append_pair("adb.search", query)
+            .append_pair("noalias", "1")
+            .append_pair("do.update", "Search");
+        if let Some(year) = year {
+            url.query_pairs_mut()
+                .append_pair("season.year", &year.to_string());
+        }
         let document = self.client.get(url).with_user_agent().send()?.html()?;
 
         if let Some(edit) = document.select(&self.edit).next() {

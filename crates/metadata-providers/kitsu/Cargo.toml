@@ -5,3 +5,4 @@ edition.workspace = true
 
 [dependencies]
 metadata-provider = {workspace = true}
+serde = {workspace = true, features = ["derive"]}
