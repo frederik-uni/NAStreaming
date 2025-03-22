@@ -14,6 +14,7 @@ pub enum ApiError {
     GenerateJwt(jsonwebtoken::errors::Error),
     ExpiredToken,
     NotFoundInDb,
+    NoPermission,
     Conflict(String),
     Bcrypt(bcrypt::BcryptError),
     Surreal(models::Error),

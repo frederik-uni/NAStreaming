@@ -2,3 +2,5 @@
 .DS_Store
 Config.toml
 /data
+venv
+venv-scrub

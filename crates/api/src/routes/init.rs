@@ -6,7 +6,7 @@ use structures::{init::InitRequest, user::JWTReponse};
 
 use crate::{
     app_data::UserExists,
-    error::ApiResult,
+    error::{ApiError, ApiResult},
     routes::user,
     services::{auth::AuthService, scan::ScanService},
 };
@@ -33,6 +33,9 @@ async fn exec2(
     scan_service: Data<ScanService>,
     auth_service: Data<AuthService>,
 ) -> ApiResult<CreatedJson<JWTReponse>> {
+    if state.lock().unwrap().exists {
+        return Err(ApiError::NoPermission);
+    }
     lib::add::exec(Json(body.group), scan_service).await?;
     let user = user::create::exec(Json(body.user), auth_service).await?;
     state.lock().unwrap().exists = true;
