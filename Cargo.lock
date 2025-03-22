@@ -260,6 +260,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-httpauth"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "456348ed9dcd72a13a1f4a660449fafdecee9ac8205552e286809eb5b0b29bd3"
+dependencies = [
+ "actix-utils",
+ "actix-web",
+ "base64 0.22.1",
+ "futures-core",
+ "futures-util",
+ "log",
+ "pin-project-lite",
+]
+
+[[package]]
 name = "addr"
 version = "0.15.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -367,14 +382,14 @@ dependencies = [
 
 [[package]]
 name = "anemyfr"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
 
 [[package]]
 name = "anidb"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
  "quick-xml",
@@ -384,7 +399,7 @@ dependencies = [
 
 [[package]]
 name = "anilist"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
  "serde",
@@ -393,42 +408,42 @@ dependencies = [
 
 [[package]]
 name = "anime-characters-database"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
 
 [[package]]
 name = "anime-news-network"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
 
 [[package]]
 name = "anime-planet"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
 
 [[package]]
 name = "animecountdown"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
 
 [[package]]
 name = "animedb-jp"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
 
 [[package]]
 name = "anisearch"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -491,16 +506,24 @@ checksum = "ea50b14b7a4b9343f8c627a7a53c52076482bd4bdad0a24fd3ec533ed616cc2c"
 
 [[package]]
 name = "api"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "actix-cors",
  "actix-web",
+ "actix-web-grants",
+ "actix-web-httpauth",
  "apistos",
  "apistos-schemars",
+ "bcrypt 0.17.0",
  "env_logger 0.11.7",
+ "jsonwebtoken",
  "log",
+ "models",
+ "rand 0.8.5",
+ "self_update",
  "serde",
  "structures",
+ "tokio",
  "toml",
 ]
 
@@ -921,8 +944,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "bcrypt"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92758ad6077e4c76a6cadbce5005f666df70d4f13b19976b1a8062eef880040f"
+dependencies = [
+ "base64 0.22.1",
+ "blowfish",
+ "getrandom 0.3.1",
+ "subtle",
+ "zeroize",
+]
+
+[[package]]
 name = "becausemoe"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -1321,6 +1357,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "console"
+version = "0.15.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "054ccb5b10f9f2cbf51eb355ca1d05c2d279ce1804688d0db74b4733a5aeafd8"
+dependencies = [
+ "encode_unicode",
+ "libc",
+ "once_cell",
+ "unicode-width 0.2.0",
+ "windows-sys 0.59.0",
+]
+
+[[package]]
 name = "constant_time_eq"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1650,7 +1699,7 @@ dependencies = [
 
 [[package]]
 name = "duckduckgo"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -1691,6 +1740,12 @@ checksum = "3d248bdd43ce613d87415282f69b9bb99d947d290b10962dd6c56233312c2ad5"
 dependencies = [
  "log",
 ]
+
+[[package]]
+name = "encode_unicode"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34aa73646ffb006b8f5147f3dc182bd4bcb190227ce861fc4a4844bf8e3cb2c0"
 
 [[package]]
 name = "encoding_rs"
@@ -1782,7 +1837,7 @@ dependencies = [
 
 [[package]]
 name = "fanart-tv"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
  "serde",
@@ -1791,7 +1846,7 @@ dependencies = [
 
 [[package]]
 name = "fandom"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
  "scraper",
@@ -1830,7 +1885,7 @@ dependencies = [
 
 [[package]]
 name = "fill-db"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dirs",
  "models",
@@ -2063,7 +2118,7 @@ dependencies = [
 
 [[package]]
 name = "gamdb"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -2124,7 +2179,7 @@ version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14dbbfd5c71d70241ecf9e6f13737f7b5ce823821063188d7e46c41d371eebd5"
 dependencies = [
- "unicode-width",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -2291,7 +2346,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hls"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "ffmpeg-next",
 ]
@@ -2637,7 +2692,7 @@ dependencies = [
 
 [[package]]
 name = "imdb"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -2668,6 +2723,19 @@ dependencies = [
  "equivalent",
  "hashbrown 0.15.2",
  "serde",
+]
+
+[[package]]
+name = "indicatif"
+version = "0.17.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "183b3088984b400f4cfac3620d5e076c84da5364016b4f49473de574b2586235"
+dependencies = [
+ "console",
+ "number_prefix",
+ "portable-atomic",
+ "unicode-width 0.2.0",
+ "web-time",
 ]
 
 [[package]]
@@ -2795,7 +2863,7 @@ dependencies = [
 
 [[package]]
 name = "kitsu"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
  "serde",
@@ -2911,7 +2979,7 @@ checksum = "23fb14cb19457329c82206317a5663005a4d404783dc74f4252769b0d5f42856"
 
 [[package]]
 name = "livechart"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -3034,7 +3102,7 @@ checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
 name = "metadata-provider"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bytes",
  "http 1.3.1",
@@ -3052,7 +3120,7 @@ dependencies = [
  "miette-derive",
  "once_cell",
  "thiserror 1.0.69",
- "unicode-width",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -3111,12 +3179,13 @@ dependencies = [
 
 [[package]]
 name = "models"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "storage-finder",
  "structures",
  "surrealdb",
+ "tokio",
 ]
 
 [[package]]
@@ -3138,7 +3207,7 @@ dependencies = [
 
 [[package]]
 name = "myanimelist"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -3246,7 +3315,7 @@ dependencies = [
 
 [[package]]
 name = "notify-moe"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -3313,6 +3382,12 @@ dependencies = [
  "hermit-abi 0.3.9",
  "libc",
 ]
+
+[[package]]
+name = "number_prefix"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "830b246a0e5f20af87141b25c173cd1b609bd7779a4617d6ec582abaf90870f3"
 
 [[package]]
 name = "object"
@@ -3914,7 +3989,7 @@ dependencies = [
 
 [[package]]
 name = "randomanime"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -3947,7 +4022,7 @@ dependencies = [
 
 [[package]]
 name = "read-once-memory"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "env_logger 0.10.2",
  "fuser",
@@ -4218,7 +4293,7 @@ checksum = "cbf4a6aa5f6d6888f39e980649f3ad6b666acdce1d78e95b8a2cb076e687ae30"
 
 [[package]]
 name = "rottentomatoes"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -4474,6 +4549,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "self-replace"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03ec815b5eab420ab893f63393878d89c90fdd94c0bcc44c07abb8ad95552fb7"
+dependencies = [
+ "fastrand",
+ "tempfile",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "self_update"
+version = "0.42.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d832c086ece0dacc29fb2947bb4219b8f6e12fe9e40b7108f9e57c4224e47b5c"
+dependencies = [
+ "hyper",
+ "indicatif",
+ "log",
+ "quick-xml",
+ "regex",
+ "reqwest",
+ "self-replace",
+ "semver",
+ "serde_json",
+ "tempfile",
+ "urlencoding",
+]
+
+[[package]]
 name = "semver"
 version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4655,7 +4760,7 @@ checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
 
 [[package]]
 name = "simkl"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -4785,7 +4890,7 @@ checksum = "d7beae5182595e9a8b683fa98c4317f956c9a2dec3b9716990d20023cc60c766"
 
 [[package]]
 name = "storage-finder"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bigdecimal",
  "regex",
@@ -4837,7 +4942,7 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "structures"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "apistos",
  "apistos-schemars",
@@ -4928,7 +5033,7 @@ dependencies = [
  "async-executor",
  "async-graphql",
  "base64 0.21.7",
- "bcrypt",
+ "bcrypt 0.15.1",
  "bincode",
  "blake3",
  "bytes",
@@ -5129,7 +5234,7 @@ dependencies = [
 
 [[package]]
 name = "themoviedb"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
  "serde",
@@ -5138,7 +5243,7 @@ dependencies = [
 
 [[package]]
 name = "thetvdb"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "base64 0.22.1",
  "metadata-provider",
@@ -5436,7 +5541,7 @@ dependencies = [
 
 [[package]]
 name = "trakt"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "metadata-provider",
 ]
@@ -5550,6 +5655,12 @@ name = "unicode-width"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
+name = "unicode-width"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fc81956842c57dac11422a97c3b8195a1ff727f06e85c84ed2e8aa277c9a0fd"
 
 [[package]]
 name = "unicode-xid"

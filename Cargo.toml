@@ -1,5 +1,5 @@
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [workspace]
@@ -24,3 +24,9 @@ regex = "1"
 base64 = "0.22.1"
 schemars = { package = "apistos-schemars", version = "0.8" }
 apistos = "0.4"
+jsonwebtoken = "9.3.1"
+bcrypt = "0.17.0"
+actix-web-httpauth = "0.8.2"
+actix-web-grants = "4.1.2"
+rand = "0.8.4"
+self_update = "0.42.0"

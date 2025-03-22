@@ -1,14 +1,20 @@
 use actix_web::web::Json;
+use actix_web_grants::AuthorityGuard;
 use apistos::{actix::CreatedJson, api_operation};
-use structures::user::NewUserRequest;
+use structures::user::{JWTReponse, NewUserRequest};
 
-use crate::error::{ApiError, ApiResult};
+use crate::{
+    error::{ApiError, ApiResult},
+    services::auth::Role,
+};
 
 #[api_operation(tag = "user", summary = "Create a user", description = r###""###)]
-async fn exec(Json(data): Json<NewUserRequest>) -> ApiResult<CreatedJson<u16>> {
+pub async fn exec(Json(data): Json<NewUserRequest>) -> ApiResult<CreatedJson<JWTReponse>> {
     Err(ApiError::NotImplemented)
 }
 
 pub fn register() -> apistos::web::Resource {
-    apistos::web::resource("/create").route(apistos::web::put().to(exec))
+    apistos::web::resource("/create")
+        .route(apistos::web::put().to(exec))
+        .guard(AuthorityGuard::new([Role::Admin]))
 }

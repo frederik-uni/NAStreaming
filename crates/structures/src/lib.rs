@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub mod entry;
 pub mod episodes;
 pub mod file;
+pub mod init;
 pub mod metadata_provider;
 pub mod movie_lib;
 pub mod search;

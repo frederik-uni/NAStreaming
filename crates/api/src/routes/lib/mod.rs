@@ -1,4 +1,4 @@
-mod add;
+pub(crate) mod add;
 mod delete;
 mod edit;
 mod list;

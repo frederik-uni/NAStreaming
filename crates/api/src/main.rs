@@ -2,6 +2,7 @@ use std::{path::Path, sync::Arc};
 
 use actix_cors::Cors;
 use actix_web::{middleware::Logger, web::redirect, App, HttpServer};
+use actix_web_httpauth::middleware::HttpAuthentication;
 use apistos::{
     app::{BuildConfig, OpenApiWrapper},
     info::Info,
@@ -11,13 +12,16 @@ use apistos::{
 use app_data::app_data_scope;
 use config::get_config;
 use log::LevelFilter;
+use services::auth::validator;
 
 mod app_data;
 mod config;
 mod error;
 mod routes;
+pub mod services;
+mod update;
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
     let config = Arc::new(get_config(Path::new("./Config.toml")).unwrap());
     let log_level = config.logging.level.as_str();
@@ -32,6 +36,13 @@ async fn main() -> std::io::Result<()> {
 
     env_logger::Builder::new().filter_level(level_filter).init();
     log::debug!("Start NASstreaming with logger: {log_level}");
+
+    let _ = tokio::task::spawn_blocking(|| {
+        if let Err(e) = update::update() {
+            log::error!("Failed to update: {e}");
+        }
+    })
+    .await;
     let config_ = config.clone();
     HttpServer::new(move || {
         let spec = Spec {
@@ -78,7 +89,11 @@ async fn main() -> std::io::Result<()> {
                 "https://github.com/frederik-uni/NAStreaming/discussions",
             ))
             .document(spec)
-            .service(app_data_scope(config.clone()).service(routes::register()))
+            .service(
+                app_data_scope(config.clone())
+                    .wrap(HttpAuthentication::with_fn(validator))
+                    .service(routes::register()),
+            )
             .build_with(
                 "/openapi.json",
                 BuildConfig::default()

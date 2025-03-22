@@ -2,7 +2,9 @@ mod entry;
 mod episode;
 mod file;
 mod home;
+mod init;
 mod lib;
+mod management;
 mod metadata_provder;
 mod user;
 
@@ -17,4 +19,5 @@ pub fn register() -> apistos::web::Scope {
         .service(lib::register())
         .service(entry::register())
         .service(metadata_provder::register())
+        .service(init::register())
 }

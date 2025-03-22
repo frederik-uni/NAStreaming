@@ -13,3 +13,11 @@ actix-cors =  {workspace = true}
 schemars = { workspace = true }
 apistos = { workspace = true, features = ["swagger-ui", "rapidoc", "redoc", "scalar", "multipart", "actix-web-grants"] }
 structures = {workspace = true, features = ["openapi"]}
+models.workspace = true
+jsonwebtoken.workspace = true
+bcrypt.workspace = true
+actix-web-httpauth.workspace = true
+actix-web-grants.workspace = true
+rand.workspace = true
+self_update.workspace = true
+tokio = { workspace = true, features = ["full"] }

@@ -9,7 +9,7 @@ use crate::error::{ApiError, ApiResult};
     summary = "Creates a new indexing lib. This is a group, which sets rules like indexing path & indexing rules",
     description = r###""###
 )]
-async fn exec(Json(data): Json<AddLibRequest>) -> ApiResult<CreatedJson<u16>> {
+pub async fn exec(Json(data): Json<AddLibRequest>) -> ApiResult<CreatedJson<u16>> {
     Err(ApiError::NotImplemented)
 }
 

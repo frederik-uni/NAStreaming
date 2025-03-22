@@ -5,12 +5,14 @@ pub mod lists;
 pub mod metadata;
 pub mod progress;
 pub mod scan_groups;
-mod user;
+pub mod user;
+mod utils;
 
 use std::sync::LazyLock;
 use surrealdb::engine::remote::ws::{Client, Ws};
 use surrealdb::opt::auth::Root;
 use surrealdb::Surreal;
+pub use utils::DbUtils;
 
 pub static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
 pub async fn connect() -> Result<(), surrealdb::Error> {

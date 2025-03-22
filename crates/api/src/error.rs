@@ -10,6 +10,22 @@ pub type ApiResult<T> = Result<T, ApiError>;
 #[openapi_error(status(code = 405, description = "Invalid input"))]
 pub enum ApiError {
     NotImplemented,
+    Auth(jsonwebtoken::errors::Error),
+    GenerateJwt(jsonwebtoken::errors::Error),
+    ExpiredToken,
+    Bcrypt(bcrypt::BcryptError),
+}
+
+impl From<bcrypt::BcryptError> for ApiError {
+    fn from(error: bcrypt::BcryptError) -> Self {
+        Self::Bcrypt(error)
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for ApiError {
+    fn from(error: jsonwebtoken::errors::Error) -> Self {
+        Self::Auth(error)
+    }
 }
 
 impl Display for ApiError {
