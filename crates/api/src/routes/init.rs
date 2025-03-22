@@ -4,7 +4,12 @@ use actix_web::web::{Data, Json};
 use apistos::{actix::CreatedJson, api_operation};
 use structures::{init::InitRequest, user::JWTReponse};
 
-use crate::{app_data::UserExists, error::ApiResult, routes::user, services::auth::AuthService};
+use crate::{
+    app_data::UserExists,
+    error::ApiResult,
+    routes::user,
+    services::{auth::AuthService, scan::ScanService},
+};
 
 use super::lib;
 
@@ -25,9 +30,10 @@ async fn exec(state: Data<Mutex<UserExists>>) -> Json<bool> {
 async fn exec2(
     Json(body): Json<InitRequest>,
     state: Data<Mutex<UserExists>>,
+    scan_service: Data<ScanService>,
     auth_service: Data<AuthService>,
 ) -> ApiResult<CreatedJson<JWTReponse>> {
-    lib::add::exec(Json(body.group)).await?;
+    lib::add::exec(Json(body.group), scan_service).await?;
     let user = user::create::exec(Json(body.user), auth_service).await?;
     state.lock().unwrap().exists = true;
     Ok(user)

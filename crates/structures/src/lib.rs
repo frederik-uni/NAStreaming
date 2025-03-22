@@ -36,14 +36,14 @@ pub enum Status {
     Upcoming,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(
     feature = "openapi",
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
 pub enum Kind {
     Movie,
-    Servies,
+    Series,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

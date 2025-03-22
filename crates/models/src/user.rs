@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 pub use surrealdb::Datetime;
 
-use crate::{table, utils::DbUtils, Record};
+use crate::{table, Record};
 
 table!(User, "users");
 #[derive(Deserialize, Serialize)]
@@ -37,7 +37,7 @@ impl User {
 
 #[cfg(test)]
 mod tests {
-    use crate::connect;
+    use crate::{connect, DbUtils as _};
 
     use super::*;
 

@@ -6,6 +6,7 @@ mod delete_full;
 mod edit;
 mod info;
 mod search;
+mod update_metadata;
 
 pub fn register() -> apistos::web::Scope {
     Scope::new("/entry")
@@ -15,4 +16,5 @@ pub fn register() -> apistos::web::Scope {
         .service(edit::register())
         .service(info::register())
         .service(search::register())
+        .service(update_metadata::register())
 }

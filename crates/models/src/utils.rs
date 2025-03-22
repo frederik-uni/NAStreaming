@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use serde::{de::DeserializeOwned, Serialize};
 use surrealdb::Error;
 
@@ -31,12 +30,16 @@ pub trait DbUtils: DeserializeOwned + Serialize + 'static {
 
         async move { DB.select((Self::table(), id.as_str())).await }
     }
+
+    fn all() -> impl std::future::Future<Output = Result<Vec<Record<Self>>, Error>> {
+        async move { DB.select(Self::table()).await }
+    }
 }
 
 #[macro_export]
 macro_rules! table {
     ($struct_name:ident, $table_name:expr) => {
-        impl DbUtils for $struct_name {
+        impl crate::utils::DbUtils for $struct_name {
             fn table() -> &'static str {
                 $table_name
             }

@@ -260,7 +260,7 @@ impl Filesystem for ReadOnceFS {
 
 fn main() {
     env_logger::init();
-    let mut fs = ReadOnceFS::new();
+    let fs = ReadOnceFS::new();
     //fs.create_file("hello.txt", b"Hello, world!".to_vec());
 
     let mountpoint = "/tmp/memdisk-once";

@@ -58,7 +58,9 @@ impl ResponseError for ApiError {
         }
     }
 }
+
 #[derive(Debug)]
+#[allow(dead_code)]
 pub enum StartUpError {
     DisplayConfig(toml::ser::Error),
     ParseConfig(toml::de::Error),
