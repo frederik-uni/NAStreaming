@@ -1,12 +1,10 @@
 use actix_web::web::Json;
 use actix_web_grants::AuthorityGuard;
 use apistos::{actix::CreatedJson, api_operation};
+use models::user::Role;
 use structures::user::ChangePasswordRequest;
 
-use crate::{
-    error::{ApiError, ApiResult},
-    services::auth::Role,
-};
+use crate::error::{ApiError, ApiResult};
 
 #[api_operation(tag = "user", summary = "Modify user", description = r###""###)]
 async fn exec(Json(data): Json<ChangePasswordRequest>) -> ApiResult<CreatedJson<u16>> {

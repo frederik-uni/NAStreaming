@@ -1,18 +1,35 @@
+use async_trait::async_trait;
+use serde::{de::DeserializeOwned, Serialize};
 use surrealdb::Error;
 
-use crate::DB;
+use crate::{Record, DB};
 
-pub trait DbUtils {
+pub trait DbUtils: DeserializeOwned + Serialize + 'static {
     fn table() -> &'static str;
-    async fn empty() -> Result<bool, Error> {
-        Ok(DB
-            .query(format!(
-                "array::len(SELECT count() from {} LIMIT 1) == 0",
-                Self::table()
-            ))
-            .await?
-            .take::<Option<bool>>(0)?
-            .unwrap_or_default())
+    fn empty() -> impl std::future::Future<Output = Result<bool, Error>> {
+        async {
+            Ok(DB
+                .query(format!(
+                    "array::len(SELECT count() from {} LIMIT 1) == 0",
+                    Self::table()
+                ))
+                .await?
+                .take::<Option<bool>>(0)?
+                .unwrap_or_default())
+        }
+    }
+
+    fn add(self) -> impl std::future::Future<Output = Result<Record<Self>, Error>> {
+        async move {
+            let mut data = DB.insert(Self::table()).content(vec![self]).await?;
+            Ok(data.remove(0))
+        }
+    }
+
+    fn get(s: &str) -> impl std::future::Future<Output = Result<Option<Record<Self>>, Error>> {
+        let id = s.to_string();
+
+        async move { DB.select((Self::table(), id.as_str())).await }
     }
 }
 

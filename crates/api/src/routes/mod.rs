@@ -20,4 +20,5 @@ pub fn register() -> apistos::web::Scope {
         .service(entry::register())
         .service(metadata_provder::register())
         .service(init::register())
+        .service(management::register())
 }

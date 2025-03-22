@@ -13,7 +13,24 @@ pub enum ApiError {
     Auth(jsonwebtoken::errors::Error),
     GenerateJwt(jsonwebtoken::errors::Error),
     ExpiredToken,
+    NotFoundInDb,
+    Conflict(String),
     Bcrypt(bcrypt::BcryptError),
+    Surreal(models::Error),
+    LoginFailed,
+    InvalidBirthdate(chrono::ParseError),
+}
+
+impl From<chrono::ParseError> for ApiError {
+    fn from(error: chrono::ParseError) -> Self {
+        Self::InvalidBirthdate(error)
+    }
+}
+
+impl From<models::Error> for ApiError {
+    fn from(error: models::Error) -> Self {
+        Self::Surreal(error)
+    }
 }
 
 impl From<bcrypt::BcryptError> for ApiError {

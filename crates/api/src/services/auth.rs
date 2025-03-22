@@ -9,22 +9,45 @@ use actix_web_grants::authorities::AttachAuthorities as _;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use jsonwebtoken::{decode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use models::{
+    user::{Role, User},
+    Record,
+};
 use serde::{Deserialize, Serialize};
+use structures::user::JWTReponse;
 
 use crate::error::{ApiError, ApiResult};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Claim {
+    pub user_id: String,
     kind: JwtType,
     role: Role,
     exp: u128,
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, Eq, PartialEq, Hash, Copy)]
-pub enum Role {
-    Admin,
-    User,
-    None,
+impl Claim {
+    pub fn new_refresh(user: &Record<User>) -> Self {
+        let duration = std::time::Duration::from_secs(60 * 60 * 24 * 365);
+        let exp = now_ms() + duration.as_millis();
+        Claim {
+            kind: JwtType::Refresh,
+            role: user.data.role,
+            exp,
+            user_id: user.id.key().to_string(),
+        }
+    }
+
+    pub fn new_access(user: &Record<User>) -> Self {
+        let duration = std::time::Duration::from_secs(60 * 15);
+        let exp = now_ms() + duration.as_millis();
+        Claim {
+            kind: JwtType::Access,
+            role: user.data.role,
+            exp,
+            user_id: user.id.key().to_string(),
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -71,6 +94,7 @@ pub async fn validator(
                 kind: JwtType::Access,
                 role: Role::None,
                 exp: 0,
+                user_id: "".to_string(),
             };
             req.attach(vec![v.role]);
             let mut ext = req.extensions_mut();
@@ -81,6 +105,7 @@ pub async fn validator(
             kind: JwtType::Access,
             role: Role::None,
             exp: 0,
+            user_id: "".to_string(),
         };
         req.attach(vec![v.role]);
         let mut ext = req.extensions_mut();
@@ -97,12 +122,19 @@ impl AuthService {
         }
     }
 
+    pub fn new_jwt_response(&self, user: &Record<User>) -> ApiResult<JWTReponse> {
+        Ok(JWTReponse {
+            access_token: self.encode_claim(&Claim::new_access(user))?,
+            refresh_token: self.encode_claim(&Claim::new_refresh(user))?,
+        })
+    }
+
     pub fn hash_password(&self, password: &str) -> ApiResult<String> {
         let hashed = hash(password, DEFAULT_COST)?;
         Ok(hashed)
     }
 
-    pub fn verify_hash(&self, password: String, hash: String) -> bool {
+    pub fn verify_hash(&self, password: String, hash: &str) -> bool {
         verify(password, &hash).unwrap_or(false)
     }
 

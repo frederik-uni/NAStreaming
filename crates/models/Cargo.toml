@@ -8,6 +8,6 @@ structures = {workspace = true}
 surrealdb = "2.2.1"
 serde = { workspace = true, features = ["derive"] }
 storage-finder = {workspace = true}
-
+async-trait = "0.1.42"
 [dev-dependencies]
 tokio = { workspace = true, features = ["full"] }

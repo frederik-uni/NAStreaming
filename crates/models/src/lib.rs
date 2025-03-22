@@ -8,11 +8,19 @@ pub mod scan_groups;
 pub mod user;
 mod utils;
 
+use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;
 use surrealdb::engine::remote::ws::{Client, Ws};
 use surrealdb::opt::auth::Root;
-use surrealdb::Surreal;
+pub use surrealdb::Error;
+use surrealdb::{RecordId, Surreal};
 pub use utils::DbUtils;
+
+#[derive(Deserialize, Serialize)]
+pub struct Record<T> {
+    pub id: RecordId,
+    pub data: T,
+}
 
 pub static DB: LazyLock<Surreal<Client>> = LazyLock::new(Surreal::init);
 pub async fn connect() -> Result<(), surrealdb::Error> {

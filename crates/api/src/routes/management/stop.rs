@@ -2,8 +2,7 @@ use std::{thread::spawn, time::Duration};
 
 use actix_web_grants::AuthorityGuard;
 use apistos::{actix::AcceptedJson, api_operation};
-
-use crate::services::auth::Role;
+use models::user::Role;
 
 #[api_operation(tag = "server-management", summary = "", description = r###""###)]
 async fn exec() -> AcceptedJson<u16> {

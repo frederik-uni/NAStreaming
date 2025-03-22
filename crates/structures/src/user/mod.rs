@@ -9,7 +9,8 @@ pub struct NewUserRequest {
     pub name: String,
     pub email: Option<String>,
     pub password: String,
-    pub birtday: u64,
+    /// rfc3339
+    pub birthdate: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -57,6 +58,7 @@ pub struct JWTReponse {
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
 pub struct UserInfoResponse {
+    pub id: String,
     pub user: String,
     pub email: Option<String>,
     pub icon: Option<String>,
