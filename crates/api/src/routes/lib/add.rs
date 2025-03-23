@@ -1,6 +1,7 @@
 use actix_web::web::{Data, Json};
+use actix_web_grants::AuthorityGuard;
 use apistos::{actix::CreatedJson, api_operation};
-use models::{scan_groups::ScanGroup, DbUtils as _};
+use models::{scan_groups::ScanGroup, user::Role, DbUtils as _};
 use structures::{movie_lib::AddLibRequest, Kind};
 
 use crate::{error::ApiResult, services::scan::ScanService};
@@ -29,5 +30,7 @@ pub async fn exec(
 }
 
 pub fn register() -> apistos::web::Resource {
-    apistos::web::resource("/add").route(apistos::web::put().to(exec))
+    apistos::web::resource("/add")
+        .route(apistos::web::put().to(exec))
+        .guard(AuthorityGuard::any([Role::Admin]))
 }

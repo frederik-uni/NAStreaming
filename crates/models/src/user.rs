@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 pub use surrealdb::Datetime;
 
-use crate::{table, Record};
+use crate::{table, Record, DB};
 
 table!(User, "users");
 #[derive(Deserialize, Serialize)]
@@ -24,14 +24,29 @@ pub enum Role {
 }
 
 impl User {
-    pub async fn find(username: &str) -> surrealdb::Result<Record<Self>> {
-        todo!()
+    pub async fn find(username: &str) -> surrealdb::Result<Option<Record<Self>>> {
+        let v: Option<Record<Self>> = DB
+            .query("SELECT * FROM users WHERE name = $user LIMIT 1")
+            .bind(("user", username.to_string()))
+            .await?
+            .take(0)?;
+        Ok(v)
     }
     pub async fn has_email(email: &str) -> surrealdb::Result<bool> {
-        todo!()
+        let v: Option<bool> = DB
+            .query("(SELECT count() FROM users WHERE email = $email LIMIT 1) == 1")
+            .bind(("email", email.to_string()))
+            .await?
+            .take(0)?;
+        Ok(v.unwrap_or_default())
     }
-    pub async fn has_name(email: &str) -> surrealdb::Result<bool> {
-        todo!()
+    pub async fn has_name(user: &str) -> surrealdb::Result<bool> {
+        let v: Option<bool> = DB
+            .query("(SELECT count() FROM users WHERE name = $user LIMIT 1) == 1")
+            .bind(("user", user.to_string()))
+            .await?
+            .take(0)?;
+        Ok(v.unwrap_or_default())
     }
 }
 

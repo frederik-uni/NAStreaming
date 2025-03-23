@@ -9,6 +9,6 @@ impl ScanService {
     }
 
     pub fn scan(&self, id: Record<ScanGroup>) {
-        todo!()
+        //TODO:
     }
 }

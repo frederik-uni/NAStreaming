@@ -31,7 +31,10 @@ pub async fn exec(
     let user = User {
         name: data.name,
         email: data.email,
-        role: Role::User,
+        role: match data.admin {
+            true => Role::Admin,
+            false => Role::User,
+        },
         password_hash: auth_service.hash_password(&data.password)?,
         updated: Default::default(),
         created: Default::default(),
@@ -48,5 +51,5 @@ pub async fn exec(
 pub fn register() -> apistos::web::Resource {
     apistos::web::resource("/create")
         .route(apistos::web::put().to(exec))
-        .guard(AuthorityGuard::new([Role::Admin]))
+        .guard(AuthorityGuard::any([Role::Admin]))
 }

@@ -19,6 +19,7 @@ pub use utils::DbUtils;
 #[derive(Deserialize, Serialize)]
 pub struct Record<T> {
     pub id: RecordId,
+    #[serde(flatten)]
     pub data: T,
 }
 

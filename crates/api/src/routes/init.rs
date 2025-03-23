@@ -16,10 +16,10 @@ use super::lib;
 #[api_operation(
     tag = "init",
     summary = "returns if the service is set up",
-    description = r###"If this is the first time the service is started, it will return true. Otherwise, it will return false."###
+    description = r###"If this is the first time the service is started, it will return false. Otherwise, it will return true."###
 )]
 async fn exec(state: Data<Mutex<UserExists>>) -> Json<bool> {
-    Json(!state.lock().unwrap().exists)
+    Json(state.lock().unwrap().exists)
 }
 
 #[api_operation(

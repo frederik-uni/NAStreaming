@@ -48,7 +48,7 @@ impl From<jsonwebtoken::errors::Error> for ApiError {
 
 impl Display for ApiError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "")
+        write!(f, "{:?}", self)
     }
 }
 

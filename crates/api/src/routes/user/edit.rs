@@ -14,5 +14,5 @@ async fn exec(Json(data): Json<ChangePasswordRequest>) -> ApiResult<CreatedJson<
 pub fn register() -> apistos::web::Resource {
     apistos::web::resource("/change-password")
         .route(apistos::web::put().to(exec))
-        .guard(AuthorityGuard::new([Role::User, Role::Admin]))
+        .guard(AuthorityGuard::any([Role::User, Role::Admin]))
 }

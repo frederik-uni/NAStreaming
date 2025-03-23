@@ -32,5 +32,5 @@ fn calculate_age(birth_date: DateTime<Utc>) -> i64 {
 pub fn register() -> apistos::web::Resource {
     apistos::web::resource("/info")
         .route(apistos::web::post().to(exec))
-        .guard(AuthorityGuard::new([Role::Admin, Role::User]))
+        .guard(AuthorityGuard::any([Role::Admin, Role::User]))
 }

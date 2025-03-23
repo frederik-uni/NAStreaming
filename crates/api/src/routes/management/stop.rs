@@ -16,5 +16,5 @@ async fn exec() -> AcceptedJson<u16> {
 pub fn register() -> apistos::web::Resource {
     apistos::web::resource("/stop")
         .route(apistos::web::post().to(exec))
-        .guard(AuthorityGuard::new([Role::Admin]))
+        .guard(AuthorityGuard::any([Role::Admin]))
 }

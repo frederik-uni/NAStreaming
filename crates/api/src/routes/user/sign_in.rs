@@ -14,7 +14,9 @@ async fn exec(
     Json(data): Json<SignInRequest>,
     auth_service: Data<AuthService>,
 ) -> ApiResult<Json<JWTReponse>> {
-    let user = User::find(&data.username).await?;
+    let user = User::find(&data.username)
+        .await?
+        .ok_or(ApiError::NotFoundInDb)?;
     if auth_service.verify_hash(data.password, &user.data.password_hash) {
         auth_service.new_jwt_response(&user).map(Json)
     } else {
@@ -25,5 +27,5 @@ async fn exec(
 pub fn register() -> apistos::web::Resource {
     apistos::web::resource("/sign-in")
         .route(apistos::web::post().to(exec))
-        .guard(AuthorityGuard::new([Role::None, Role::Admin]))
+        .guard(AuthorityGuard::any([Role::None, Role::Admin]))
 }

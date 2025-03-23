@@ -1,5 +1,7 @@
 use actix_web::web::Json;
+use actix_web_grants::AuthorityGuard;
 use apistos::api_operation;
+use models::user::Role;
 use structures::IdRequest;
 
 use crate::error::{ApiError, ApiResult};
@@ -14,5 +16,7 @@ async fn exec(Json(id): Json<IdRequest>) -> ApiResult<Json<u16>> {
 }
 
 pub fn register() -> apistos::web::Resource {
-    apistos::web::resource("/delete").route(apistos::web::delete().to(exec))
+    apistos::web::resource("/delete")
+        .route(apistos::web::delete().to(exec))
+        .guard(AuthorityGuard::any([Role::Admin]))
 }

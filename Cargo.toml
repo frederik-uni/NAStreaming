@@ -31,3 +31,9 @@ actix-web-grants = "4.1.2"
 rand = "0.8.4"
 self_update = "0.42.0"
 chrono = "0.4"
+surrealdb = "2.2.1"
+
+[patch.crates-io]
+serde = { git = "https://github.com/frederik-uni/serde" }
+serde-content = { git = "https://github.com/frederik-uni/serde-content" }
+actix-web-grants = { git = "https://github.com/frederik-uni/protect-endpoints", branch="frederik-uni-patch-1" }

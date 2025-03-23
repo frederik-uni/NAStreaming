@@ -50,8 +50,8 @@ def create_sprites(image_folder, sprite_folder, sprite_size=30):
             y = (idx // cols) * height
             sprite.paste(img, (x, y))
 
-        sprite_path = os.path.join(sprite_folder, f"sprite_{i // sprite_size:06d}.jpg")
-        sprite.save(sprite_path, "JPEG")
+        sprite_path = os.path.join(sprite_folder, f"sprite_{i // sprite_size:06d}.webp")
+        sprite.save(sprite_path, "WEBP", quality=85)
 
         sprite_files[sprite_path] = [int(img_file.split('.')[0]) for img_file in batch]
 

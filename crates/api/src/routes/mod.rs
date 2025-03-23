@@ -6,6 +6,7 @@ mod init;
 mod lib;
 mod management;
 mod metadata_provder;
+mod services;
 mod user;
 
 use apistos::web::Scope;
@@ -21,4 +22,5 @@ pub fn register() -> apistos::web::Scope {
         .service(metadata_provder::register())
         .service(init::register())
         .service(management::register())
+        .service(services::register())
 }

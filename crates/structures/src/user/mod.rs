@@ -11,6 +11,7 @@ pub struct NewUserRequest {
     pub password: String,
     /// rfc3339
     pub birthdate: String,
+    pub admin: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

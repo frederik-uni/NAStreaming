@@ -27,5 +27,5 @@ async fn exec(
 pub fn register() -> apistos::web::Resource {
     apistos::web::resource("/refresh")
         .route(apistos::web::post().to(exec))
-        .guard(AuthorityGuard::new([Role::User, Role::Admin]))
+        .guard(AuthorityGuard::any([Role::User, Role::Admin]))
 }

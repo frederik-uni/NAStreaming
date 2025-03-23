@@ -1,4 +1,7 @@
-use std::{path::Path, sync::Arc};
+use std::{
+    path::Path,
+    sync::{Arc, Mutex},
+};
 
 use actix_cors::Cors;
 use actix_web::{middleware::Logger, web::redirect, App, HttpServer};
@@ -9,7 +12,7 @@ use apistos::{
     spec::Spec,
     RapidocConfig, RedocConfig, ScalarConfig, SwaggerUIConfig,
 };
-use app_data::app_data_scope;
+use app_data::{app_data_scope, UserExists};
 use config::get_config;
 use log::LevelFilter;
 use services::auth::validator;
@@ -44,6 +47,10 @@ async fn main() -> std::io::Result<()> {
     })
     .await;
     let config_ = config.clone();
+    models::connect()
+        .await
+        .expect("Failed to initilize db connection");
+    let user_exists = Arc::new(Mutex::new(UserExists::init().await));
     HttpServer::new(move || {
         let spec = Spec {
             info: Info {
@@ -90,7 +97,7 @@ async fn main() -> std::io::Result<()> {
             ))
             .document(spec)
             .service(
-                app_data_scope(config.clone())
+                app_data_scope(config.clone(), user_exists.clone())
                     .wrap(HttpAuthentication::with_fn(validator))
                     .service(routes::register()),
             )

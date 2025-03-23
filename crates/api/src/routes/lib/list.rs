@@ -1,6 +1,7 @@
 use actix_web::web::Json;
+use actix_web_grants::AuthorityGuard;
 use apistos::api_operation;
-use models::DbUtils as _;
+use models::{user::Role, DbUtils as _};
 use structures::{movie_lib::ScanGroupListResponse, PaginationRequest};
 
 use crate::error::ApiResult;
@@ -28,5 +29,7 @@ async fn exec(Json(_data): Json<PaginationRequest>) -> ApiResult<Json<ScanGroupL
 }
 
 pub fn register() -> apistos::web::Resource {
-    apistos::web::resource("/list").route(apistos::web::post().to(exec))
+    apistos::web::resource("/list")
+        .route(apistos::web::post().to(exec))
+        .guard(AuthorityGuard::any([Role::Admin]))
 }

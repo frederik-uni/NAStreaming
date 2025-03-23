@@ -1,6 +1,7 @@
 use actix_web::web::Json;
+use actix_web_grants::AuthorityGuard;
 use apistos::{actix::CreatedJson, api_operation};
-use models::scan_groups::ScanGroup;
+use models::{scan_groups::ScanGroup, user::Role};
 use structures::movie_lib::EditLibRequest;
 
 use crate::error::{ApiError, ApiResult};
@@ -21,5 +22,7 @@ async fn exec(Json(data): Json<EditLibRequest>) -> ApiResult<CreatedJson<u16>> {
 }
 
 pub fn register() -> apistos::web::Resource {
-    apistos::web::resource("/edit").route(apistos::web::post().to(exec))
+    apistos::web::resource("/edit")
+        .route(apistos::web::post().to(exec))
+        .guard(AuthorityGuard::any([Role::Admin]))
 }
