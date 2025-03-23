@@ -1,7 +1,9 @@
 pub type Result<T> = std::result::Result<T, Error>;
 
+use std::collections::HashMap;
 use std::fmt;
 use std::net::SocketAddr;
+use std::sync::Arc;
 use std::time::Duration;
 
 use ::reqwest::header;
@@ -19,6 +21,7 @@ pub use http::HeaderMap;
 pub use http::StatusCode;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
+use tokio::sync::Mutex;
 
 use crate::Error;
 
@@ -29,6 +32,7 @@ pub mod reqwest {
 #[derive(Clone, Default)]
 pub struct Client {
     client: reqwest::Client,
+    locks: Arc<Mutex<HashMap<String, Arc<Mutex<()>>>>>,
     retries: u32,
 }
 
@@ -280,6 +284,7 @@ impl Response {
 
 pub struct RequestBuilder {
     req: reqwest::RequestBuilder,
+    locks: Arc<Mutex<HashMap<String, Arc<Mutex<()>>>>>,
     retries: u32,
 }
 
@@ -287,6 +292,7 @@ impl RequestBuilder {
     pub fn retries(self) -> RequestBuilder {
         RequestBuilder {
             req: self.req,
+            locks: self.locks,
             retries: self.retries,
         }
     }
@@ -295,6 +301,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.header(USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"),
             retries: self.retries,
+            locks: self.locks,
         }
     }
     /// Add a `Header` to this Request.
@@ -320,6 +327,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.header(key, value),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -352,6 +360,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.headers(headers),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -374,6 +383,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.basic_auth(username, password),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -395,6 +405,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.bearer_auth(token),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -445,6 +456,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.body(body),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -457,6 +469,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.timeout(timeout),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -494,6 +507,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.query(query),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -502,6 +516,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.version(version),
             retries: self.retries,
+            locks: self.locks,
         }
     }
 
@@ -534,6 +549,7 @@ impl RequestBuilder {
     pub fn form<T: Serialize + ?Sized>(self, form: &T) -> RequestBuilder {
         RequestBuilder {
             req: self.req.form(form),
+            locks: self.locks,
             retries: self.retries,
         }
     }
@@ -572,6 +588,7 @@ impl RequestBuilder {
     pub fn json<T: Serialize + ?Sized>(self, json: &T) -> RequestBuilder {
         RequestBuilder {
             req: self.req.json(json),
+            locks: self.locks,
             retries: self.retries,
         }
     }
@@ -593,6 +610,7 @@ impl RequestBuilder {
             Client {
                 client: c,
                 retries: self.retries,
+                locks: self.locks.clone(),
             },
             r.map_err(Error::Reqwest),
         )
@@ -606,13 +624,16 @@ impl RequestBuilder {
     /// redirect loop was detected or redirect limit was exhausted.
     pub async fn send(self) -> Result<Response> {
         let mut tries = 0;
-        let mut req = self.req;
+        let retries = self.retries;
+        let (client, req) = self.build_split();
+        let mut req = req?;
         let mut copy = req.try_clone();
-        while tries <= self.retries {
-            let resp = match req.send().await {
+
+        while tries <= retries {
+            let resp = match client.execute(req).await {
                 Ok(v) => v,
                 Err(e) => {
-                    if tries >= self.retries || copy.is_none() {
+                    if tries >= retries || copy.is_none() {
                         return Err(e.into());
                     }
                     tries += 1;
@@ -631,7 +652,7 @@ impl RequestBuilder {
                 bytes: match resp.bytes().await {
                     Ok(v) => v,
                     Err(e) => {
-                        if tries >= self.retries || copy.is_none() {
+                        if tries >= retries || copy.is_none() {
                             return Err(e.into());
                         }
                         tries += 1;
@@ -693,6 +714,7 @@ impl RequestBuilder {
         self.req.try_clone().map(|req| RequestBuilder {
             req,
             retries: self.retries,
+            locks: self.locks.clone(),
         })
     }
 }
@@ -764,6 +786,20 @@ impl Client {
         RequestBuilder {
             req: self.client.request(method, url),
             retries: self.retries,
+            locks: self.locks.clone(),
+        }
+    }
+
+    pub async fn execute(&self, request: Request) -> Result<reqwest::Response> {
+        if let Some(domain) = request.url().domain() {
+            let lock = {
+                let mut locks = self.locks.lock().await;
+                locks.entry(domain.to_string()).or_default().clone()
+            };
+            let _lock = lock.lock().await;
+            Ok(self.client.execute(request).await?)
+        } else {
+            Ok(self.client.execute(request).await?)
         }
     }
 }
