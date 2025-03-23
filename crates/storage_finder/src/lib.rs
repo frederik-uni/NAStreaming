@@ -6,6 +6,7 @@ mod segments;
 mod suffixes;
 
 pub use parser::parse_library;
+pub use parser::Entry;
 pub use resolution::Resolutions;
 pub use segments::Episode;
 pub use suffixes::Cut;
@@ -19,10 +20,11 @@ mod tests {
 
     use crate::parser::parse_library;
 
-    #[test]
-    fn test() {
-        let path: PathBuf = "/Volumes/NAStreaming/Anime".into();
-        let v = parse_library(&path, &Default::default());
+    #[tokio::test]
+    async fn tesparse_ss() {
+        let path: PathBuf = "/Users/frederik/movie_files".into();
+
+        let v = parse_library(&path, &Default::default()).await;
         println!("{}", v.len());
     }
 }

@@ -1,7 +1,35 @@
-use serde::{de::DeserializeOwned, Serialize};
-use surrealdb::Error;
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use surrealdb::{Error, RecordId};
 
 use crate::{Record, DB};
+
+#[derive(Deserialize, Serialize)]
+pub struct RecordIdTyped<T: DeserializeOwned> {
+    id: RecordId,
+    #[serde(skip)]
+    _marker: std::marker::PhantomData<T>,
+}
+
+impl<T: DeserializeOwned> Clone for RecordIdTyped<T> {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id.clone(),
+            _marker: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<T: DeserializeOwned> RecordIdTyped<T> {
+    pub fn get(self) -> impl std::future::Future<Output = Result<Option<Record<T>>, Error>> {
+        async move { DB.select(self.id).await }
+    }
+    pub fn new(id: RecordId) -> Self {
+        Self {
+            id,
+            _marker: std::marker::PhantomData,
+        }
+    }
+}
 
 pub trait DbUtils: DeserializeOwned + Serialize + 'static {
     fn table() -> &'static str;
@@ -15,6 +43,15 @@ pub trait DbUtils: DeserializeOwned + Serialize + 'static {
                 .await?
                 .take::<Option<bool>>(0)?
                 .unwrap_or_default())
+        }
+    }
+
+    fn add_bulk(
+        entries: Vec<Self>,
+    ) -> impl std::future::Future<Output = Result<Vec<Record<Self>>, Error>> {
+        async {
+            let data = DB.insert(Self::table()).content(entries).await?;
+            Ok(data)
         }
     }
 

@@ -17,6 +17,7 @@ async fn exec(Json(_data): Json<PaginationRequest>) -> ApiResult<Json<ScanGroupL
         scan_groups: all
             .into_iter()
             .map(|v| structures::movie_lib::ScanGroup {
+                id: v.id.key().to_string(),
                 name: v.data.name,
                 path: v.data.path,
                 detect_path: v.data.detect_path,

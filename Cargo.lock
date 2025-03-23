@@ -252,7 +252,7 @@ dependencies = [
 [[package]]
 name = "actix-web-grants"
 version = "4.1.2"
-source = "git+https://github.com/frederik-uni/protect-endpoints?branch=frederik-uni-patch-1#0c5fef2afe9058a352aa204c4a3d7a905312982e"
+source = "git+https://github.com/frederik-uni/protect-endpoints?branch=frederik-uni-patch-1#46ff5459f377c1381133970caf75606b4bb76b5e"
 dependencies = [
  "actix-web",
  "protect-endpoints-proc-macro",
@@ -522,6 +522,7 @@ dependencies = [
  "rand 0.8.5",
  "self_update",
  "serde",
+ "storage-finder",
  "structures",
  "tokio",
  "toml",
@@ -833,6 +834,17 @@ dependencies = [
  "indexmap 2.8.0",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "async-recursion"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b43422f69d8ff38f95f1b2bb76517c91589a924d1559a0e935d7c8ce0274c11"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.100",
 ]
 
 [[package]]
@@ -3744,7 +3756,7 @@ dependencies = [
 [[package]]
 name = "protect-endpoints-proc-macro"
 version = "0.4.0"
-source = "git+https://github.com/frederik-uni/protect-endpoints?branch=frederik-uni-patch-1#0c5fef2afe9058a352aa204c4a3d7a905312982e"
+source = "git+https://github.com/frederik-uni/protect-endpoints?branch=frederik-uni-patch-1#46ff5459f377c1381133970caf75606b4bb76b5e"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -4857,9 +4869,11 @@ checksum = "d7beae5182595e9a8b683fa98c4317f956c9a2dec3b9716990d20023cc60c766"
 name = "storage-finder"
 version = "0.1.1"
 dependencies = [
+ "async-recursion",
  "bigdecimal",
  "regex",
  "serde",
+ "tokio",
 ]
 
 [[package]]

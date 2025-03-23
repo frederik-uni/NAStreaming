@@ -8,7 +8,7 @@ use crate::{
     app_data::UserExists,
     error::{ApiError, ApiResult},
     routes::user,
-    services::{auth::AuthService, scan::ScanService},
+    services::{auth::AuthService, Services},
 };
 
 use super::lib;
@@ -30,13 +30,13 @@ async fn exec(state: Data<Mutex<UserExists>>) -> Json<bool> {
 async fn exec2(
     Json(body): Json<InitRequest>,
     state: Data<Mutex<UserExists>>,
-    scan_service: Data<ScanService>,
+    services: Data<Mutex<Services>>,
     auth_service: Data<AuthService>,
 ) -> ApiResult<CreatedJson<JWTReponse>> {
     if state.lock().unwrap().exists {
         return Err(ApiError::NoPermission);
     }
-    lib::add::exec(Json(body.group), scan_service).await?;
+    lib::add::exec(Json(body.group), services).await?;
     let user = user::create::exec(Json(body.user), auth_service).await?;
     state.lock().unwrap().exists = true;
     Ok(user)

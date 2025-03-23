@@ -6,7 +6,7 @@ use models::{user, DbUtils as _};
 
 use crate::{
     config::Config,
-    services::{auth::AuthService, scan::ScanService},
+    services::{auth::AuthService, Services},
 };
 
 pub struct UserExists {
@@ -25,7 +25,7 @@ impl UserExists {
 pub fn app_data_scope(config: Arc<Config>, user_exists: Arc<Mutex<UserExists>>) -> Scope {
     Scope::new("/api")
         .app_data(Data::from(user_exists))
-        .app_data(Data::new(ScanService::new()))
+        .app_data(Data::from(Services::new()))
         .app_data(Data::new(AuthService::new(
             config.server.secret_key.as_bytes().to_vec(),
         )))

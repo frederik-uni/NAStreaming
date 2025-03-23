@@ -1,5 +1,3 @@
-pub mod search;
-
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
@@ -9,9 +7,9 @@ use serde::{Deserialize, Serialize};
     feature = "openapi",
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
-pub struct AddEntryRequest {
-    pub name: String,
-    pub path: Option<String>,
+pub struct DispatchRequest {
+    pub service: String,
+    pub ctx: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -19,6 +17,6 @@ pub struct AddEntryRequest {
     feature = "openapi",
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
-pub struct EntryInfoResponse {
-    titles: HashMap<String, Vec<String>>,
+pub struct ServiceStateResponse {
+    pub services: HashMap<String, bool>,
 }

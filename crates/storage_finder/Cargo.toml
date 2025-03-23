@@ -7,5 +7,10 @@ edition = { workspace = true }
 
 [dependencies]
 regex = {  workspace=true }
+tokio = { workspace = true, features = ["full"] }
 serde = { workspace=true, features = ["derive"] }
 bigdecimal = {version = "0.4.7", features = ["serde"]}
+async-recursion.workspace=true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

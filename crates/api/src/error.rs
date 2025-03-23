@@ -22,6 +22,17 @@ pub enum ApiError {
     InvalidBirthdate(chrono::ParseError),
 }
 
+#[derive(Debug)]
+pub struct ReportError;
+
+impl From<ApiError> for ReportError {
+    fn from(error: ApiError) -> Self {
+        println!("{:?}", error);
+        //TODO: report error
+        Self
+    }
+}
+
 impl From<chrono::ParseError> for ApiError {
     fn from(error: chrono::ParseError) -> Self {
         Self::InvalidBirthdate(error)

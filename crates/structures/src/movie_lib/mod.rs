@@ -37,6 +37,7 @@ pub struct EditLibRequest {
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
 pub struct ScanGroup {
+    pub id: String,
     pub name: String,
     pub path: PathBuf,
     pub detect_path: Option<PathBuf>,

@@ -9,6 +9,7 @@ pub mod init;
 pub mod metadata_provider;
 pub mod movie_lib;
 pub mod search;
+pub mod services;
 pub mod user;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -15,6 +15,21 @@ pub enum Segment {
     Curly(String),
 }
 
+impl Segment {
+    pub fn as_u16(&self) -> Option<u16> {
+        match self {
+            Segment::Br(s) => s.trim().parse().ok(),
+            _ => None,
+        }
+    }
+    pub fn is_year(&self) -> bool {
+        match self {
+            Segment::Br(s) => s.trim().len() == 4 && s.trim().chars().all(|c| c.is_ascii_digit()),
+            _ => false,
+        }
+    }
+}
+
 pub enum Segment2 {
     Str(String),
     SeasonEpi((u64, Episode)),

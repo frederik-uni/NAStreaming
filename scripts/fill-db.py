@@ -30,8 +30,11 @@ def init():
 
 def start_scan():
     response = requests.post(base+"/lib/list", json={"limit": 100, "offset": 0}, headers=headers)
-    for group in response.json()["scan_groups"]:
-        print(group)
+    id = response.json()["scan_groups"][0]["id"]
+    response = requests.post(base+"/services/list", json={"limit": 100, "offset": 0}, headers=headers)
+    assert response.json() == ["scan"]
+    response = requests.put(base+"/services/dispatch", json={"service": "scan", "ctx": id}, headers=headers)
+    print(response, response.text)
 
 if __name__ == "__main__":
     token = init()
