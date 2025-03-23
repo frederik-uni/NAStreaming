@@ -19,6 +19,7 @@ pub use bytes::Bytes;
 use http::header::USER_AGENT;
 pub use http::HeaderMap;
 pub use http::StatusCode;
+use priority_async_mutex::PriorityMutex;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tokio::sync::Mutex;
@@ -32,8 +33,9 @@ pub mod reqwest {
 #[derive(Clone, Default)]
 pub struct Client {
     client: reqwest::Client,
-    locks: Arc<Mutex<HashMap<String, Arc<Mutex<()>>>>>,
+    locks: Arc<Mutex<HashMap<String, Arc<PriorityMutex<()>>>>>,
     retries: u32,
+    priority: Arc<std::sync::Mutex<u32>>,
 }
 
 impl Client {
@@ -284,7 +286,8 @@ impl Response {
 
 pub struct RequestBuilder {
     req: reqwest::RequestBuilder,
-    locks: Arc<Mutex<HashMap<String, Arc<Mutex<()>>>>>,
+    locks: Arc<Mutex<HashMap<String, Arc<PriorityMutex<()>>>>>,
+    priority: u32,
     retries: u32,
 }
 
@@ -293,6 +296,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req,
             locks: self.locks,
+            priority: self.priority,
             retries: self.retries,
         }
     }
@@ -302,6 +306,7 @@ impl RequestBuilder {
             req: self.req.header(USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"),
             retries: self.retries,
             locks: self.locks,
+            priority: self.priority,
         }
     }
     /// Add a `Header` to this Request.
@@ -327,6 +332,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.header(key, value),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -360,6 +366,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.headers(headers),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -383,6 +390,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.basic_auth(username, password),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -405,6 +413,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.bearer_auth(token),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -456,6 +465,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.body(body),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -469,6 +479,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.timeout(timeout),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -507,6 +518,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.query(query),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -516,6 +528,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.version(version),
             retries: self.retries,
+            priority: self.priority,
             locks: self.locks,
         }
     }
@@ -550,6 +563,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.form(form),
             locks: self.locks,
+            priority: self.priority,
             retries: self.retries,
         }
     }
@@ -589,6 +603,7 @@ impl RequestBuilder {
         RequestBuilder {
             req: self.req.json(json),
             locks: self.locks,
+            priority: self.priority,
             retries: self.retries,
         }
     }
@@ -611,6 +626,7 @@ impl RequestBuilder {
                 client: c,
                 retries: self.retries,
                 locks: self.locks.clone(),
+                priority: Arc::new(std::sync::Mutex::new(self.priority)),
             },
             r.map_err(Error::Reqwest),
         )
@@ -714,6 +730,7 @@ impl RequestBuilder {
         self.req.try_clone().map(|req| RequestBuilder {
             req,
             retries: self.retries,
+            priority: self.priority.clone(),
             locks: self.locks.clone(),
         })
     }
@@ -786,17 +803,25 @@ impl Client {
         RequestBuilder {
             req: self.client.request(method, url),
             retries: self.retries,
+            priority: *self.priority.lock().unwrap(),
             locks: self.locks.clone(),
         }
+    }
+
+    pub fn set_priority(&self, priority: u32) {
+        *self.priority.lock().unwrap() = priority;
     }
 
     pub async fn execute(&self, request: Request) -> Result<reqwest::Response> {
         if let Some(domain) = request.url().domain() {
             let lock = {
                 let mut locks = self.locks.lock().await;
-                locks.entry(domain.to_string()).or_default().clone()
+                locks
+                    .entry(domain.to_string())
+                    .or_insert_with(|| Arc::new(PriorityMutex::new(())))
+                    .clone()
             };
-            let _lock = lock.lock().await;
+            let _lock = lock.lock(*self.priority.lock().unwrap());
             Ok(self.client.execute(request).await?)
         } else {
             Ok(self.client.execute(request).await?)

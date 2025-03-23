@@ -35,6 +35,7 @@ chrono = "0.4"
 surrealdb = "2.2.1"
 async-recursion = "1.1"
 async-trait = "0.1"
+priority-async-mutex = "0.1.1"
 
 [patch.crates-io]
 serde = { git = "https://github.com/frederik-uni/serde" }

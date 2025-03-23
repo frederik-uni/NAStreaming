@@ -12,3 +12,4 @@ serde.workspace = true
 async-trait.workspace = true
 serde_json.workspace = true
 tokio = {workspace = true, features = ["sync"]}
+priority-async-mutex.workspace = true
