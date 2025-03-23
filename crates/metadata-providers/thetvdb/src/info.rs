@@ -5,7 +5,7 @@ use serde_json::json;
 use crate::Instance;
 
 impl Instance {
-    pub fn lookup(&self, id: &str) -> Result<Root1, Error> {
+    pub async fn lookup(&self, id: &str) -> Result<Root1, Error> {
         let (kind, id) = id.split_once("-").ok_or(Error::InvalidId)?;
         let url = self
             .server
@@ -23,10 +23,12 @@ impl Instance {
         //seasons/{id}/extended
         self.client
             .get(url)
-            .header(AUTHORIZATION, format!("Bearer {}", self.get_token()?))
+            .header(AUTHORIZATION, format!("Bearer {}", self.get_token().await?))
             .json(&json!({"short": false, "meta": "translations"}))
-            .send()?
+            .send()
+            .await?
             .json()
+            .await
     }
 }
 

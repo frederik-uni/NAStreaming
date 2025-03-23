@@ -1,19 +1,25 @@
 use std::collections::HashMap;
 
 use metadata_provider::{
+    async_trait,
     fetcher::Url,
-    search::{SearchProvider, SearchResult},
+    search::{Capabilities, SearchProvider, SearchResult},
 };
 use serde::{Deserialize, Serialize};
 
 use crate::Instance;
 
+#[async_trait]
 impl SearchProvider for Instance {
-    fn capabilities(&self) -> Vec<metadata_provider::search::Capabilities> {
-        todo!()
+    fn capabilities(&self) -> Vec<Capabilities> {
+        vec![
+            Capabilities::TitleExact,
+            Capabilities::Year,
+            Capabilities::Category,
+        ]
     }
 
-    fn search(
+    async fn search(
         &self,
         query: &str,
         year: Option<u16>,
@@ -42,7 +48,7 @@ impl SearchProvider for Instance {
                 },
             );
         }
-        let data: Root1 = self.client.get(url).send()?.json()?;
+        let data: Root1 = self.client.get(url).send().await?.json().await?;
         Ok(data
             .data
             .into_iter()

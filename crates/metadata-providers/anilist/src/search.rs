@@ -85,12 +85,16 @@ const QUERY: &str = "query (
 }
 ";
 
-use metadata_provider::search::{Capabilities, SearchProvider, SearchResult};
+use metadata_provider::{
+    async_trait,
+    search::{Capabilities, SearchProvider, SearchResult},
+};
 use serde::Deserialize;
 use serde_json::json;
 
 use crate::Instance;
 
+#[async_trait]
 impl SearchProvider for Instance {
     fn capabilities(&self) -> Vec<Capabilities> {
         vec![
@@ -100,7 +104,7 @@ impl SearchProvider for Instance {
         ]
     }
 
-    fn search(
+    async fn search(
         &self,
         query: &str,
         year: Option<u16>,
@@ -121,8 +125,10 @@ impl SearchProvider for Instance {
             .client
             .post("https://graphql.anilist.co")
             .json(&body)
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         Ok(data
             .data
             .page

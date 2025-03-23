@@ -2,15 +2,13 @@ mod info;
 mod login;
 mod search;
 
-use std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
+use std::{collections::HashMap, sync::Arc};
 
 use metadata_provider::{
     fetcher::{Client, Url},
     MetadataProvider,
 };
+use tokio::sync::Mutex;
 
 pub struct Instance {
     pub key: String,
@@ -75,8 +73,8 @@ mod tests {
 
     use crate::Instance;
 
-    #[test]
-    fn demo() {
+    #[tokio::test]
+    async fn demo() {
         let data = read_to_string("../../../Config.toml").unwrap();
         let parsed: HashMap<String, HashMap<String, Value>> = toml::from_str(&data).unwrap();
         let map = parsed
@@ -90,6 +88,7 @@ mod tests {
         let search_instance = instance.search().expect("unreachable");
         let result = search_instance
             .search("One piece", Some(1999), Some(true))
+            .await
             .expect("Test failed");
 
         println!("{:#?}", result);

@@ -50,12 +50,13 @@ mod tests {
 
     use crate::Instance;
 
-    #[test]
-    fn demo() {
+    #[tokio::test]
+    async fn demo() {
         let instance = Instance::new(Default::default()).expect("unreachable");
         let search_instance = instance.search().expect("unreachable");
         let result = search_instance
             .search("One piece", Some(1999), Some(true))
+            .await
             .expect("Test failed");
 
         println!("{:#?}", result);

@@ -4,13 +4,13 @@ use serde::{Deserialize, Serialize};
 use crate::Instance;
 
 impl Instance {
-    pub fn lookup(&self, id: &str) -> Result<Root1, Error> {
+    pub async fn lookup(&self, id: &str) -> Result<Root1, Error> {
         let (kind, id) = id.split_once("-").unwrap_or_default();
         let url = format!(
             "http://webservice.fanart.tv/v3/{}/{}?api_key={}",
             kind, id, self.key
         );
-        let data: Root1 = self.client.get(url).send()?.json()?;
+        let data: Root1 = self.client.get(url).send().await?.json().await?;
         Ok(data)
     }
 }

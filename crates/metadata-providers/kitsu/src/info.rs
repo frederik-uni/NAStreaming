@@ -4,11 +4,13 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 impl Instance {
-    pub fn lookup(&self, id: &str) -> Result<Root1, Error> {
+    pub async fn lookup(&self, id: &str) -> Result<Root1, Error> {
         self.client
             .get(format!("https://kitsu.app/api/edge/anime/{id}"))
-            .send()?
+            .send()
+            .await?
             .json()
+            .await
     }
 }
 

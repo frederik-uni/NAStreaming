@@ -1,3 +1,5 @@
+use async_trait::async_trait;
+
 use crate::Error;
 
 pub enum Capabilities {
@@ -5,9 +7,10 @@ pub enum Capabilities {
     Year,
     TitleExact,
 }
+#[async_trait]
 pub trait SearchProvider {
     fn capabilities(&self) -> Vec<Capabilities>;
-    fn search(
+    async fn search(
         &self,
         query: &str,
         year: Option<u16>,

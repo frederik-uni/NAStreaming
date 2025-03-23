@@ -8,3 +8,6 @@ metadata-provider = {workspace = true}
 serde = {workspace = true, features = ["derive"]}
 quick-xml = {version = "0.37.2", features = ["serialize"]}
 scraper.workspace = true
+
+[dev-dependencies]
+tokio = {workspace = true, features = ["macros", "rt-multi-thread"]}

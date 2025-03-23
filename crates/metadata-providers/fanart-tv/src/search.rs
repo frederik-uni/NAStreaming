@@ -1,16 +1,18 @@
 use metadata_provider::{
+    async_trait,
     fetcher::Url,
     search::{Capabilities, SearchProvider, SearchResult},
 };
 
 use crate::Instance;
 
+#[async_trait]
 impl SearchProvider for Instance {
     fn capabilities(&self) -> Vec<Capabilities> {
         vec![Capabilities::Category]
     }
 
-    fn search(
+    async fn search(
         &self,
         query: &str,
         _year: Option<u16>,
@@ -27,7 +29,14 @@ impl SearchProvider for Instance {
         .unwrap();
 
         url.query_pairs_mut().append_pair("s", query);
-        let data: Vec<Root1> = self.client.get(url).with_user_agent().send()?.json()?;
+        let data: Vec<Root1> = self
+            .client
+            .get(url)
+            .with_user_agent()
+            .send()
+            .await?
+            .json()
+            .await?;
 
         Ok(data
             .into_iter()

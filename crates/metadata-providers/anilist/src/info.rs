@@ -249,7 +249,7 @@ query media($id: Int, $type: MediaType, $isAdult: Boolean) {
 ";
 
 impl Instance {
-    pub fn lookup(&self, id: &str) -> Result<Root1, Error> {
+    pub async fn lookup(&self, id: &str) -> Result<Root1, Error> {
         let json = json!({"query": QUERY2, "variables": {"id": id.parse::<u32>().map_err(|_|Error::InvalidId)?, "type":"ANIME","isAdult":false}});
         let resp: Root1 = self
             .client
@@ -257,8 +257,10 @@ impl Instance {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             .body(json.to_string())
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         Ok(resp)
     }
 }

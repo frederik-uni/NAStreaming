@@ -62,8 +62,8 @@ mod tests {
 
     use crate::Instance;
 
-    #[test]
-    fn demo() {
+    #[tokio::test]
+    async fn demo() {
         let data = read_to_string("../../../Config.toml").unwrap();
         let parsed: HashMap<String, HashMap<String, Value>> = toml::from_str(&data).unwrap();
         let map = parsed
@@ -77,6 +77,7 @@ mod tests {
         let search_instance = instance.search().expect("unreachable");
         let result = search_instance
             .search("One piece", None, Some(true))
+            .await
             .expect("Test failed");
 
         println!("{:#?}", result);

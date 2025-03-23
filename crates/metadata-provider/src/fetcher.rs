@@ -1,15 +1,16 @@
 pub type Result<T> = std::result::Result<T, Error>;
+
 use std::fmt;
 use std::net::SocketAddr;
 use std::time::Duration;
 
-use ::reqwest::blocking::Body;
-use ::reqwest::blocking::Request;
 use ::reqwest::header;
 use ::reqwest::header::HeaderName;
 use ::reqwest::header::HeaderValue;
+use ::reqwest::Body;
 use ::reqwest::IntoUrl;
 pub use ::reqwest::Method;
+use ::reqwest::Request;
 pub use ::reqwest::Url;
 pub use ::reqwest::Version;
 pub use bytes::Bytes;
@@ -26,9 +27,27 @@ pub mod reqwest {
 }
 
 #[derive(Clone, Default)]
-pub struct Client(reqwest::blocking::Client);
+pub struct Client {
+    client: reqwest::Client,
+    retries: u32,
+}
 
-pub struct Response(reqwest::blocking::Response);
+impl Client {
+    pub async fn retries(mut self, retries: u32) -> Self {
+        self.retries = retries;
+        self
+    }
+}
+
+pub struct Response {
+    bytes: Bytes,
+    headers: HeaderMap,
+    status: StatusCode,
+    version: Version,
+    url: Url,
+    remote_addr: Option<SocketAddr>,
+    extensions: http::Extensions,
+}
 
 impl Response {
     /// Get the `StatusCode` of this `Response`.
@@ -40,7 +59,7 @@ impl Response {
     /// ```rust
     /// # #[cfg(feature = "json")]
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let resp = reqwest::blocking::get("http://httpbin.org/get")?;
+    /// let resp = reqwest::get("http://httpbin.org/get")?;
     /// if resp.status().is_success() {
     ///     println!("success!");
     /// } else if resp.status().is_server_error() {
@@ -55,7 +74,7 @@ impl Response {
     /// Checking for specific status codes:
     ///
     /// ```rust
-    /// use reqwest::blocking::Client;
+    /// use reqwest::Client;
     /// use reqwest::StatusCode;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = Client::new();
@@ -76,7 +95,7 @@ impl Response {
     /// ```
     #[inline]
     pub fn status(&self) -> StatusCode {
-        self.0.status()
+        self.status
     }
 
     /// Get the `Headers` of this `Response`.
@@ -86,7 +105,7 @@ impl Response {
     /// Saving an etag when caching a file:
     ///
     /// ```
-    /// use reqwest::blocking::Client;
+    /// use reqwest::Client;
     /// use reqwest::header::ETAG;
     ///
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -105,19 +124,19 @@ impl Response {
     /// ```
     #[inline]
     pub fn headers(&self) -> &HeaderMap {
-        self.0.headers()
+        &self.headers
     }
 
     /// Get a mutable reference to the `Headers` of this `Response`.
     #[inline]
     pub fn headers_mut(&mut self) -> &mut HeaderMap {
-        self.0.headers_mut()
+        &mut self.headers
     }
 
     /// Get the HTTP `Version` of this `Response`.
     #[inline]
     pub fn version(&self) -> Version {
-        self.0.version()
+        self.version
     }
 
     /// Get the final `Url` of this `Response`.
@@ -126,14 +145,14 @@ impl Response {
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let resp = reqwest::blocking::get("http://httpbin.org/redirect/1")?;
+    /// let resp = reqwest::get("http://httpbin.org/redirect/1")?;
     /// assert_eq!(resp.url().as_str(), "http://httpbin.org/get");
     /// # Ok(())
     /// # }
     /// ```
     #[inline]
     pub fn url(&self) -> &Url {
-        self.0.url()
+        &self.url
     }
 
     /// Get the remote address used to get this `Response`.
@@ -142,23 +161,23 @@ impl Response {
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let resp = reqwest::blocking::get("http://httpbin.org/redirect/1")?;
+    /// let resp = reqwest::get("http://httpbin.org/redirect/1")?;
     /// println!("httpbin.org address: {:?}", resp.remote_addr());
     /// # Ok(())
     /// # }
     /// ```
     pub fn remote_addr(&self) -> Option<SocketAddr> {
-        self.0.remote_addr()
+        self.remote_addr
     }
 
     /// Returns a reference to the associated extensions.
     pub fn extensions(&self) -> &http::Extensions {
-        self.0.extensions()
+        &self.extensions
     }
 
     /// Returns a mutable reference to the associated extensions.
     pub fn extensions_mut(&mut self) -> &mut http::Extensions {
-        self.0.extensions_mut()
+        &mut self.extensions
     }
 
     /// Get the content-length of the response, if it is known.
@@ -168,8 +187,8 @@ impl Response {
     /// - The server didn't send a `content-length` header.
     /// - The response is gzipped and automatically decoded (thus changing
     ///   the actual decoded length).
-    pub fn content_length(&self) -> Option<u64> {
-        self.0.content_length()
+    pub fn content_length(&self) -> usize {
+        self.bytes.len()
     }
 
     /// Try and deserialize the response body as JSON using `serde`.
@@ -194,7 +213,7 @@ impl Response {
     /// }
     ///
     /// # fn run() -> Result<(), Error> {
-    /// let json: Ip = reqwest::blocking::get("http://httpbin.org/ip")?.json()?;
+    /// let json: Ip = reqwest::get("http://httpbin.org/ip")?.json()?;
     /// # Ok(())
     /// # }
     /// #
@@ -208,8 +227,8 @@ impl Response {
     /// details please see [`serde_json::from_reader`].
     ///
     /// [`serde_json::from_reader`]: https://docs.serde.rs/serde_json/fn.from_reader.html
-    pub fn json<T: DeserializeOwned>(self) -> Result<T> {
-        Ok(self.0.json()?)
+    pub async fn json<T: DeserializeOwned>(self) -> Result<T> {
+        Ok(serde_json::from_slice(&self.bytes.to_vec())?)
     }
 
     /// Get the full response body as `Bytes`.
@@ -218,14 +237,14 @@ impl Response {
     ///
     /// ```
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let bytes = reqwest::blocking::get("http://httpbin.org/ip")?.bytes()?;
+    /// let bytes = reqwest::get("http://httpbin.org/ip")?.bytes()?;
     ///
     /// println!("bytes: {bytes:?}");
     /// # Ok(())
     /// # }
     /// ```
-    pub fn bytes(self) -> Result<Bytes> {
-        Ok(self.0.bytes()?)
+    pub fn bytes(self) -> Bytes {
+        self.bytes
     }
 
     /// Get the response text.
@@ -245,71 +264,38 @@ impl Response {
     /// ```rust
     /// # extern crate reqwest;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let content = reqwest::blocking::get("http://httpbin.org/range/26")?.text()?;
+    /// let content = reqwest::get("http://httpbin.org/range/26")?.text()?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn text(self) -> Result<String> {
-        Ok(self.0.text()?)
+    pub fn text(self) -> String {
+        let text = String::from_utf8_lossy(&self.bytes);
+        text.into_owned()
     }
 
-    pub fn html(self) -> Result<scraper::Html> {
-        Ok(scraper::Html::parse_document(self.text()?.as_str()))
-    }
-
-    /// Copy the response body into a writer.
-    ///
-    /// This function internally uses [`std::io::copy`] and hence will continuously read data from
-    /// the body and then write it into writer in a streaming fashion until EOF is met.
-    ///
-    /// On success, the total number of bytes that were copied to `writer` is returned.
-    ///
-    /// [`std::io::copy`]: https://doc.rust-lang.org/std/io/fn.copy.html
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut resp = reqwest::blocking::get("http://httpbin.org/range/5")?;
-    /// let mut buf: Vec<u8> = vec![];
-    /// resp.copy_to(&mut buf)?;
-    /// assert_eq!(b"abcde", buf.as_slice());
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn copy_to<W: ?Sized>(&mut self, w: &mut W) -> Result<u64>
-    where
-        W: std::io::Write,
-    {
-        Ok(self.0.copy_to(w)?)
-    }
-
-    /// Turn a response into an error if the server returned an error.
-    ///
-    /// # Example
-    ///
-    /// ```rust,no_run
-    /// # extern crate reqwest;
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let res = reqwest::blocking::get("http://httpbin.org/status/400")?
-    ///     .error_for_status();
-    /// if let Err(err) = res {
-    ///     assert_eq!(err.status(), Some(reqwest::StatusCode::BAD_REQUEST));
-    /// }
-    /// # Ok(())
-    /// # }
-    /// # fn main() {}
-    /// ```
-    pub fn error_for_status(self) -> Result<Self> {
-        Ok(self.0.error_for_status()?).map(Self)
+    pub fn html(self) -> scraper::Html {
+        scraper::Html::parse_document(self.text().as_str())
     }
 }
 
-pub struct RequestBuilder(reqwest::blocking::RequestBuilder);
+pub struct RequestBuilder {
+    req: reqwest::RequestBuilder,
+    retries: u32,
+}
 
 impl RequestBuilder {
+    pub fn retries(self) -> RequestBuilder {
+        RequestBuilder {
+            req: self.req,
+            retries: self.retries,
+        }
+    }
+
     pub fn with_user_agent(self) -> RequestBuilder {
-        RequestBuilder(self.0.header(USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"))
+        RequestBuilder {
+            req: self.req.header(USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"),
+            retries: self.retries,
+        }
     }
     /// Add a `Header` to this Request.
     ///
@@ -317,7 +303,7 @@ impl RequestBuilder {
     /// use reqwest::header::USER_AGENT;
     ///
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.get("https://www.rust-lang.org")
     ///     .header(USER_AGENT, "foo")
     ///     .send()?;
@@ -331,7 +317,10 @@ impl RequestBuilder {
         <HeaderName as TryFrom<K>>::Error: Into<http::Error>,
         <HeaderValue as TryFrom<V>>::Error: Into<http::Error>,
     {
-        RequestBuilder(self.0.header(key, value))
+        RequestBuilder {
+            req: self.req.header(key, value),
+            retries: self.retries,
+        }
     }
 
     /// Add a set of Headers to the existing ones on this Request.
@@ -351,7 +340,7 @@ impl RequestBuilder {
     ///
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let file = fs::File::open("much_beauty.png")?;
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.post("http://httpbin.org/post")
     ///     .headers(construct_headers())
     ///     .body(file)
@@ -360,14 +349,17 @@ impl RequestBuilder {
     /// # }
     /// ```
     pub fn headers(self, headers: header::HeaderMap) -> RequestBuilder {
-        RequestBuilder(self.0.headers(headers))
+        RequestBuilder {
+            req: self.req.headers(headers),
+            retries: self.retries,
+        }
     }
 
     /// Enable HTTP basic authentication.
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let resp = client.delete("http://httpbin.org/delete")
     ///     .basic_auth("admin", Some("good password"))
     ///     .send()?;
@@ -379,14 +371,17 @@ impl RequestBuilder {
         U: fmt::Display,
         P: fmt::Display,
     {
-        RequestBuilder(self.0.basic_auth(username, password))
+        RequestBuilder {
+            req: self.req.basic_auth(username, password),
+            retries: self.retries,
+        }
     }
 
     /// Enable HTTP bearer authentication.
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let resp = client.delete("http://httpbin.org/delete")
     ///     .bearer_auth("token")
     ///     .send()?;
@@ -397,7 +392,10 @@ impl RequestBuilder {
     where
         T: fmt::Display,
     {
-        RequestBuilder(self.0.bearer_auth(token))
+        RequestBuilder {
+            req: self.req.bearer_auth(token),
+            retries: self.retries,
+        }
     }
 
     /// Set the request body.
@@ -408,7 +406,7 @@ impl RequestBuilder {
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.post("http://httpbin.org/post")
     ///     .body("from a &str!")
     ///     .send()?;
@@ -421,7 +419,7 @@ impl RequestBuilder {
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let file = std::fs::File::open("from_a_file.txt")?;
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.post("http://httpbin.org/post")
     ///     .body(file)
     ///     .send()?;
@@ -436,7 +434,7 @@ impl RequestBuilder {
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// // from bytes!
     /// let bytes: Vec<u8> = vec![1, 10, 100];
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.post("http://httpbin.org/post")
     ///     .body(bytes)
     ///     .send()?;
@@ -444,7 +442,10 @@ impl RequestBuilder {
     /// # }
     /// ```
     pub fn body<T: Into<Body>>(self, body: T) -> RequestBuilder {
-        RequestBuilder(self.0.body(body))
+        RequestBuilder {
+            req: self.req.body(body),
+            retries: self.retries,
+        }
     }
 
     /// Enables a request timeout.
@@ -453,7 +454,10 @@ impl RequestBuilder {
     /// response body has finished. It affects only this request and overrides
     /// the timeout configured using `ClientBuilder::timeout()`.
     pub fn timeout(self, timeout: Duration) -> RequestBuilder {
-        RequestBuilder(self.0.timeout(timeout))
+        RequestBuilder {
+            req: self.req.timeout(timeout),
+            retries: self.retries,
+        }
     }
 
     /// Modify the query string of the URL.
@@ -469,7 +473,7 @@ impl RequestBuilder {
     /// # use reqwest::Error;
     /// #
     /// # fn run() -> Result<(), Error> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.get("http://httpbin.org")
     ///     .query(&[("lang", "rust")])
     ///     .send()?;
@@ -487,12 +491,18 @@ impl RequestBuilder {
     /// This method will fail if the object you provide cannot be serialized
     /// into a query string.
     pub fn query<T: Serialize + ?Sized>(self, query: &T) -> RequestBuilder {
-        RequestBuilder(self.0.query(query))
+        RequestBuilder {
+            req: self.req.query(query),
+            retries: self.retries,
+        }
     }
 
     /// Set HTTP version
     pub fn version(self, version: Version) -> RequestBuilder {
-        RequestBuilder(self.0.version(version))
+        RequestBuilder {
+            req: self.req.version(version),
+            retries: self.retries,
+        }
     }
 
     /// Send a form body.
@@ -509,7 +519,7 @@ impl RequestBuilder {
     /// let mut params = HashMap::new();
     /// params.insert("lang", "rust");
     ///
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.post("http://httpbin.org")
     ///     .form(&params)
     ///     .send()?;
@@ -522,7 +532,10 @@ impl RequestBuilder {
     /// This method fails if the passed value cannot be serialized into
     /// url encoded format
     pub fn form<T: Serialize + ?Sized>(self, form: &T) -> RequestBuilder {
-        RequestBuilder(self.0.form(form))
+        RequestBuilder {
+            req: self.req.form(form),
+            retries: self.retries,
+        }
     }
 
     /// Send a JSON body.
@@ -544,7 +557,7 @@ impl RequestBuilder {
     /// let mut map = HashMap::new();
     /// map.insert("lang", "rust");
     ///
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let res = client.post("http://httpbin.org")
     ///     .json(&map)
     ///     .send()?;
@@ -557,13 +570,16 @@ impl RequestBuilder {
     /// Serialization can fail if `T`'s implementation of `Serialize` decides to
     /// fail, or if `T` contains a map with non-string keys.
     pub fn json<T: Serialize + ?Sized>(self, json: &T) -> RequestBuilder {
-        RequestBuilder(self.0.json(json))
+        RequestBuilder {
+            req: self.req.json(json),
+            retries: self.retries,
+        }
     }
 
     /// Build a `Request`, which can be inspected, modified and executed with
     /// `Client::execute()`.
     pub fn build(self) -> Result<Request> {
-        Ok(self.0.build()?)
+        Ok(self.req.build()?)
     }
 
     /// Build a `Request`, which can be inspected, modified and executed with
@@ -572,8 +588,14 @@ impl RequestBuilder {
     /// This is similar to [`RequestBuilder::build()`], but also returns the
     /// embedded `Client`.
     pub fn build_split(self) -> (Client, Result<Request>) {
-        let (c, r) = self.0.build_split();
-        (Client(c), r.map_err(Error::Reqwest))
+        let (c, r) = self.req.build_split();
+        (
+            Client {
+                client: c,
+                retries: self.retries,
+            },
+            r.map_err(Error::Reqwest),
+        )
     }
 
     /// Constructs the Request and sends it the target URL, returning a Response.
@@ -582,8 +604,45 @@ impl RequestBuilder {
     ///
     /// This method fails if there was an error while sending request,
     /// redirect loop was detected or redirect limit was exhausted.
-    pub fn send(self) -> Result<Response> {
-        Ok(self.0.send()?).map(Response)
+    pub async fn send(self) -> Result<Response> {
+        let mut tries = 0;
+        let mut req = self.req;
+        let mut copy = req.try_clone();
+        while tries <= self.retries {
+            let resp = match req.send().await {
+                Ok(v) => v,
+                Err(e) => {
+                    if tries >= self.retries || copy.is_none() {
+                        return Err(e.into());
+                    }
+                    tries += 1;
+                    req = copy.take().unwrap();
+                    copy = req.try_clone();
+                    continue;
+                }
+            };
+            return Ok(Response {
+                headers: resp.headers().clone(),
+                status: resp.status(),
+                version: resp.version(),
+                url: resp.url().clone(),
+                remote_addr: resp.remote_addr(),
+                extensions: resp.extensions().clone(),
+                bytes: match resp.bytes().await {
+                    Ok(v) => v,
+                    Err(e) => {
+                        if tries >= self.retries || copy.is_none() {
+                            return Err(e.into());
+                        }
+                        tries += 1;
+                        req = copy.take().unwrap();
+                        copy = req.try_clone();
+                        continue;
+                    }
+                },
+            });
+        }
+        unreachable!()
     }
 
     /// Attempts to clone the `RequestBuilder`.
@@ -597,7 +656,7 @@ impl RequestBuilder {
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let builder = client.post("http://httpbin.org/post")
     ///     .body("from a &str!");
     /// let clone = builder.try_clone();
@@ -610,7 +669,7 @@ impl RequestBuilder {
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let builder = client.get("http://httpbin.org/get");
     /// let clone = builder.try_clone();
     /// assert!(clone.is_some());
@@ -622,16 +681,19 @@ impl RequestBuilder {
     ///
     /// ```rust
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = reqwest::blocking::Client::new();
+    /// let client = reqwest::Client::new();
     /// let builder = client.get("http://httpbin.org/get")
-    ///     .body(reqwest::blocking::Body::new(std::io::empty()));
+    ///     .body(reqwest::Body::new(std::io::empty()));
     /// let clone = builder.try_clone();
     /// assert!(clone.is_none());
     /// # Ok(())
     /// # }
     /// ```
     pub fn try_clone(&self) -> Option<RequestBuilder> {
-        self.0.try_clone().map(RequestBuilder)
+        self.req.try_clone().map(|req| RequestBuilder {
+            req,
+            retries: self.retries,
+        })
     }
 }
 
@@ -699,6 +761,9 @@ impl Client {
     ///
     /// This method fails whenever supplied `Url` cannot be parsed.
     pub fn request<U: IntoUrl>(&self, method: Method, url: U) -> RequestBuilder {
-        RequestBuilder(self.0.request(method, url))
+        RequestBuilder {
+            req: self.client.request(method, url),
+            retries: self.retries,
+        }
     }
 }

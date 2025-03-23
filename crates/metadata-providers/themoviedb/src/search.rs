@@ -1,4 +1,5 @@
 use metadata_provider::{
+    async_trait,
     fetcher::{reqwest::header::AUTHORIZATION, Url},
     search::{Capabilities, SearchProvider, SearchResult},
 };
@@ -6,6 +7,7 @@ use serde::Deserialize;
 
 use crate::Instance;
 
+#[async_trait]
 impl SearchProvider for Instance {
     fn capabilities(&self) -> Vec<Capabilities> {
         vec![
@@ -15,7 +17,7 @@ impl SearchProvider for Instance {
         ]
     }
 
-    fn search(
+    async fn search(
         &self,
         query: &str,
         year: Option<u16>,
@@ -39,8 +41,10 @@ impl SearchProvider for Instance {
             .client
             .get(url)
             .header(AUTHORIZATION, format!("Bearer {}", self.access_token))
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         Ok(data
             .results
             .into_iter()

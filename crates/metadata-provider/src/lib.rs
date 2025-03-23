@@ -5,6 +5,8 @@ use std::collections::HashMap;
 
 use search::SearchProvider;
 
+pub use async_trait::async_trait;
+
 pub enum State {
     Planed,
     WIP,
@@ -21,8 +23,15 @@ pub enum DataRetrievel {
 #[derive(Debug)]
 pub enum Error {
     Reqwest(::reqwest::Error),
+    Serde(serde_json::Error),
     NodeNotFound,
     InvalidId,
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(value: serde_json::Error) -> Self {
+        Self::Serde(value)
+    }
 }
 
 impl From<::reqwest::Error> for Error {

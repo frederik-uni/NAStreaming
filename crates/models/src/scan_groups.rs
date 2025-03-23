@@ -1,7 +1,6 @@
 use crate::table;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use storage_finder::Entry;
 use surrealdb::{Error, RecordId};
 
 table!(ScanGroup, "scan_groups");

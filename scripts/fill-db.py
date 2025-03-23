@@ -31,7 +31,7 @@ def init():
 def start_scan():
     response = requests.post(base+"/lib/list", json={"limit": 100, "offset": 0}, headers=headers)
     id = response.json()["scan_groups"][0]["id"]
-    response = requests.post(base+"/services/list", json={"limit": 100, "offset": 0}, headers=headers)
+    response = requests.post(base+"/services/list", headers=headers)
     assert response.json() == ["scan"]
     response = requests.put(base+"/services/dispatch", json={"service": "scan", "ctx": id}, headers=headers)
     print(response, response.text)

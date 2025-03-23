@@ -12,7 +12,7 @@ struct Claims {
 }
 
 impl Instance {
-    pub fn login(&self) -> Result<String, Error> {
+    pub async fn login(&self) -> Result<String, Error> {
         let url = self.server.join("/v4/login").unwrap();
         let client: Root1 = self
             .client
@@ -21,13 +21,15 @@ impl Instance {
                 "apikey": self.key,
                 "pin": self.pin
             }))
-            .send()?
-            .json()?;
+            .send()
+            .await?
+            .json()
+            .await?;
         Ok(client.data.token)
     }
 
-    pub fn get_token(&self) -> Result<String, Error> {
-        let mut token = self.access_token.lock().unwrap();
+    pub async fn get_token(&self) -> Result<String, Error> {
+        let mut token = self.access_token.lock().await;
         if let Some(token) = &*token {
             let payload = token.split('.').nth(1);
             let exp = payload
@@ -42,7 +44,7 @@ impl Instance {
                 return Ok(token.clone());
             }
         }
-        let t = self.login()?;
+        let t = self.login().await?;
         *token = Some(t.clone());
         Ok(t)
     }
