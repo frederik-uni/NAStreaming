@@ -25,6 +25,12 @@ pub enum ApiError {
 #[derive(Debug)]
 pub struct ReportError;
 
+impl From<metadata_provider::Error> for ApiError {
+    fn from(error: metadata_provider::Error) -> Self {
+        todo!()
+    }
+}
+
 impl From<ApiError> for ReportError {
     fn from(error: ApiError) -> Self {
         println!("{:?}", error);

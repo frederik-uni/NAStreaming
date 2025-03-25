@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use metadata_provider::{
     async_trait,
-    fetcher::Url,
+    fetcher::{Client, Url},
     search::{Capabilities, SearchProvider, SearchResult},
 };
 use serde::{Deserialize, Serialize};
@@ -21,6 +21,7 @@ impl SearchProvider for Instance {
 
     async fn search(
         &self,
+        client: &Client,
         query: &str,
         year: Option<u16>,
         series: Option<bool>,
@@ -48,7 +49,7 @@ impl SearchProvider for Instance {
                 },
             );
         }
-        let data: Root1 = self.client.get(url).send().await?.json().await?;
+        let data: Root1 = client.get(url).send().await?.json().await?;
         Ok(data
             .data
             .into_iter()

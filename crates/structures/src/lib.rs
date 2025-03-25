@@ -6,6 +6,7 @@ pub mod entry;
 pub mod episodes;
 pub mod file;
 pub mod init;
+pub mod link;
 pub mod metadata_provider;
 pub mod movie_lib;
 pub mod search;
@@ -19,6 +20,15 @@ pub mod user;
 )]
 pub struct IdRequest {
     pub id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "openapi",
+    derive(schemars::JsonSchema, apistos::ApiComponent)
+)]
+pub struct IdArrayRequest {
+    pub ids: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -105,4 +115,16 @@ pub struct DirResponse {
 pub struct File {
     pub dir: bool,
     pub name: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[cfg_attr(
+    feature = "openapi",
+    derive(schemars::JsonSchema, apistos::ApiComponent)
+)]
+pub enum Episode {
+    List(Vec<String>),
+    Single(String),
+    Part(String, u64),
+    RangeInclusive(String, String),
 }

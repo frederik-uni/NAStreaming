@@ -87,6 +87,7 @@ const QUERY: &str = "query (
 
 use metadata_provider::{
     async_trait,
+    fetcher::Client,
     search::{Capabilities, SearchProvider, SearchResult},
 };
 use serde::Deserialize;
@@ -106,6 +107,7 @@ impl SearchProvider for Instance {
 
     async fn search(
         &self,
+        client: &Client,
         query: &str,
         year: Option<u16>,
         series: Option<bool>,
@@ -121,8 +123,7 @@ impl SearchProvider for Instance {
             };
         }
         let body = json!({"query": QUERY, "variables": variables});
-        let data: Root1 = self
-            .client
+        let data: Root1 = client
             .post("https://graphql.anilist.co")
             .json(&body)
             .send()

@@ -1,7 +1,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use base64::{engine::general_purpose::STANDARD, Engine as _};
-use metadata_provider::Error;
+use metadata_provider::{fetcher::Client, Error};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -12,10 +12,9 @@ struct Claims {
 }
 
 impl Instance {
-    pub async fn login(&self) -> Result<String, Error> {
+    pub async fn login(&self, client: &Client) -> Result<String, Error> {
         let url = self.server.join("/v4/login").unwrap();
-        let client: Root1 = self
-            .client
+        let client: Root1 = client
             .post(url)
             .json(&json!({
                 "apikey": self.key,
@@ -28,7 +27,7 @@ impl Instance {
         Ok(client.data.token)
     }
 
-    pub async fn get_token(&self) -> Result<String, Error> {
+    pub async fn get_token(&self, client: &Client) -> Result<String, Error> {
         let mut token = self.access_token.lock().await;
         if let Some(token) = &*token {
             let payload = token.split('.').nth(1);
@@ -44,7 +43,7 @@ impl Instance {
                 return Ok(token.clone());
             }
         }
-        let t = self.login().await?;
+        let t = self.login(client).await?;
         *token = Some(t.clone());
         Ok(t)
     }

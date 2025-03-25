@@ -1,4 +1,4 @@
-use metadata_provider::Error;
+use metadata_provider::{fetcher::Client, Error};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -249,10 +249,9 @@ query media($id: Int, $type: MediaType, $isAdult: Boolean) {
 ";
 
 impl Instance {
-    pub async fn lookup(&self, id: &str) -> Result<Root1, Error> {
+    pub async fn lookup(&self, client: &Client, id: &str) -> Result<Root1, Error> {
         let json = json!({"query": QUERY2, "variables": {"id": id.parse::<u32>().map_err(|_|Error::InvalidId)?, "type":"ANIME","isAdult":false}});
-        let resp: Root1 = self
-            .client
+        let resp: Root1 = client
             .post("https://graphql.anilist.co/")
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")

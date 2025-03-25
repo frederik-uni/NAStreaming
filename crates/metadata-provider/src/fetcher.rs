@@ -30,7 +30,7 @@ pub mod reqwest {
     pub use reqwest::*;
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Client {
     client: reqwest::Client,
     locks: Arc<Mutex<HashMap<String, Arc<PriorityMutex<()>>>>>,
@@ -39,6 +39,15 @@ pub struct Client {
 }
 
 impl Client {
+    pub fn new() -> Self {
+        Client {
+            client: reqwest::Client::new(),
+            locks: Arc::new(Mutex::new(HashMap::new())),
+            retries: 2,
+            priority: Arc::new(std::sync::Mutex::new(0)),
+        }
+    }
+
     pub async fn retries(mut self, retries: u32) -> Self {
         self.retries = retries;
         self
@@ -808,6 +817,7 @@ impl Client {
         }
     }
 
+    /// lower priorities are woken up first.
     pub fn set_priority(&self, priority: u32) {
         *self.priority.lock().unwrap() = priority;
     }

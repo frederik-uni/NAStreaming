@@ -1,6 +1,6 @@
 use metadata_provider::{
     async_trait,
-    fetcher::Url,
+    fetcher::{Client, Url},
     search::{Capabilities, SearchProvider, SearchResult},
 };
 
@@ -14,6 +14,7 @@ impl SearchProvider for Instance {
 
     async fn search(
         &self,
+        client: &Client,
         query: &str,
         _year: Option<u16>,
         series: Option<bool>,
@@ -29,8 +30,7 @@ impl SearchProvider for Instance {
         .unwrap();
 
         url.query_pairs_mut().append_pair("s", query);
-        let data: Vec<Root1> = self
-            .client
+        let data: Vec<Root1> = client
             .get(url)
             .with_user_agent()
             .send()

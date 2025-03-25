@@ -20,6 +20,30 @@ structures = { path = "crates/structures" }
 models = { path = "crates/models" }
 storage-finder = { path = "crates/storage_finder" }
 metadata-provider = { path = "crates/metadata-provider" }
+anemyfr = {path = "crates/metadata-providers/anemyfr"}
+anidb = {path = "crates/metadata-providers/anidb"}
+anilist = {path = "crates/metadata-providers/anilist"}
+anime-characters-database = {path = "crates/metadata-providers/anime-characters-database"}
+anime-news-network = {path = "crates/metadata-providers/anime-news-network"}
+anime-planet = {path = "crates/metadata-providers/anime-planet"}
+animecountdown = {path = "crates/metadata-providers/animecountdown"}
+animedb-jp = {path = "crates/metadata-providers/animedb-jp"}
+anisearch = {path = "crates/metadata-providers/anisearch"}
+becausemoe = {path = "crates/metadata-providers/becausemoe"}
+fanart-tv = {path = "crates/metadata-providers/fanart-tv"}
+fandom = {path = "crates/metadata-providers/fandom"}
+gamdb = {path = "crates/metadata-providers/gamdb"}
+imdb = {path = "crates/metadata-providers/imdb"}
+kitsu = {path = "crates/metadata-providers/kitsu"}
+livechart = {path = "crates/metadata-providers/livechart"}
+myanimelist = {path = "crates/metadata-providers/myanimelist"}
+notify-moe = {path = "crates/metadata-providers/notify-moe"}
+randomanime = {path = "crates/metadata-providers/randomanime"}
+rottentomatoes = {path = "crates/metadata-providers/rottentomatoes"}
+simkl = {path = "crates/metadata-providers/simkl"}
+themoviedb = {path = "crates/metadata-providers/themoviedb"}
+thetvdb = {path = "crates/metadata-providers/thetvdb"}
+trakt = {path = "crates/metadata-providers/trakt"}
 scraper = "0.23"
 regex = "1"
 base64 = "0.22.1"

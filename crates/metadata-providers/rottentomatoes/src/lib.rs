@@ -4,14 +4,16 @@ use metadata_provider::MetadataProvider;
 
 pub struct Instance {}
 
-impl MetadataProvider for Instance {
-    fn new(_data: HashMap<String, String>) -> Result<Box<Self>, String> {
+impl Instance {
+    pub fn new(
+        _data: HashMap<String, String>,
+    ) -> Result<Box<dyn MetadataProvider + 'static>, String> {
         Ok(Box::new(Self {}))
     }
-    fn id() -> &'static str {
-        "rottentomatoes"
-    }
+}
+pub const ID: &'static str = "rottentomatoes";
 
+impl MetadataProvider for Instance {
     fn name(&self) -> &'static str {
         "Rotten Tomatoes"
     }

@@ -3,22 +3,20 @@ mod search;
 
 use std::collections::HashMap;
 
-use metadata_provider::{fetcher::Client, Issue, MetadataProvider};
+use metadata_provider::{Issue, MetadataProvider};
 
-pub struct Instance {
-    client: Client,
+pub struct Instance {}
+impl Instance {
+    pub fn new(
+        _data: HashMap<String, String>,
+    ) -> Result<Box<dyn MetadataProvider + 'static>, String> {
+        Ok(Box::new(Self {}))
+    }
 }
 
-impl MetadataProvider for Instance {
-    fn new(_data: HashMap<String, String>) -> Result<Box<Self>, String> {
-        Ok(Box::new(Self {
-            client: Default::default(),
-        }))
-    }
-    fn id() -> &'static str {
-        "anilist"
-    }
+pub const ID: &'static str = "anilist";
 
+impl MetadataProvider for Instance {
     fn name(&self) -> &'static str {
         "AniList"
     }
@@ -50,7 +48,7 @@ impl MetadataProvider for Instance {
 
 #[cfg(test)]
 mod tests {
-    use metadata_provider::MetadataProvider;
+    use metadata_provider::{fetcher::Client, MetadataProvider};
 
     use crate::Instance;
 
@@ -59,7 +57,7 @@ mod tests {
         let instance = Instance::new(Default::default()).expect("unreachable");
         let search_instance = instance.search().expect("unreachable");
         let result = search_instance
-            .search("One piece", Some(1999), None)
+            .search(&Client::new(), "One piece", Some(1999), None)
             .await
             .expect("Test failed");
 
@@ -69,6 +67,6 @@ mod tests {
     #[test]
     fn lookup() {
         let instance = Instance::new(Default::default()).expect("unreachable");
-        instance.lookup("176301");
+        //instance.lookup(&Client::new(), "176301");
     }
 }

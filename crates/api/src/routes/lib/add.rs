@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{fs::create_dir_all, sync::Mutex};
 
 use actix_web::web::{Data, Json};
 use actix_web_grants::AuthorityGuard;
@@ -20,6 +20,10 @@ pub async fn exec(
     Json(data): Json<AddLibRequest>,
     services: Data<Mutex<Services>>,
 ) -> ApiResult<CreatedJson<u16>> {
+    let _ = create_dir_all(&data.path);
+    if let Some(path) = &data.discover_path {
+        let _ = create_dir_all(path);
+    }
     let group = ScanGroup {
         name: data.name,
         path: data.path,
@@ -30,6 +34,7 @@ pub async fn exec(
     }
     .add()
     .await?;
+
     services.lock().unwrap().start_with_ctx(
         "scan",
         vec![Value::Bool(true), Value::String(group.id.key().to_string())],

@@ -1,16 +1,16 @@
-use metadata_provider::Error;
+use metadata_provider::{fetcher::Client, Error};
 use serde::{Deserialize, Serialize};
 
 use crate::Instance;
 
 impl Instance {
-    pub async fn lookup(&self, id: &str) -> Result<Root1, Error> {
+    pub async fn lookup(&self, client: &Client, id: &str) -> Result<Root1, Error> {
         let (kind, id) = id.split_once("-").unwrap_or_default();
         let url = format!(
             "http://webservice.fanart.tv/v3/{}/{}?api_key={}",
             kind, id, self.key
         );
-        let data: Root1 = self.client.get(url).send().await?.json().await?;
+        let data: Root1 = client.get(url).send().await?.json().await?;
         Ok(data)
     }
 }

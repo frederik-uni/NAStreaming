@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -5,6 +7,15 @@ use serde::{Deserialize, Serialize};
 pub struct Resolutions {
     pub width: Option<u32>,
     pub height: u32,
+}
+
+impl Display for Resolutions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.width {
+            Some(width) => write!(f, "{} × {}", width, self.height),
+            None => write!(f, "{}p", self.height),
+        }
+    }
 }
 
 impl Resolutions {

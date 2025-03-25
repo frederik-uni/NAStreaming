@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use metadata_provider::{
     async_trait,
-    fetcher::reqwest::header::AUTHORIZATION,
+    fetcher::{reqwest::header::AUTHORIZATION, Client},
     search::{Capabilities, SearchProvider, SearchResult},
 };
 use serde::Deserialize;
@@ -13,6 +13,7 @@ use crate::Instance;
 impl SearchProvider for Instance {
     async fn search(
         &self,
+        client: &Client,
         query: &str,
         year: Option<u16>,
         series: Option<bool>,
@@ -36,10 +37,12 @@ impl SearchProvider for Instance {
             url.query_pairs_mut().append_pair("year", &y.to_string());
         }
 
-        let items: Root1 = self
-            .client
+        let items: Root1 = client
             .get(url)
-            .header(AUTHORIZATION, format!("Bearer {}", self.get_token().await?))
+            .header(
+                AUTHORIZATION,
+                format!("Bearer {}", self.get_token(client).await?),
+            )
             .send()
             .await?
             .json()

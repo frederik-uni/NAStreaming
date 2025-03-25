@@ -1,8 +1,6 @@
 pub mod fetcher;
 pub mod search;
 
-use std::collections::HashMap;
-
 use search::SearchProvider;
 
 pub use async_trait::async_trait;
@@ -44,10 +42,6 @@ pub enum Issue {
     SeasonsAreSeperateEntries,
 }
 pub trait MetadataProvider {
-    /// Init instance
-    fn new(data: HashMap<String, String>) -> Result<Box<Self>, String>;
-    /// Unique id
-    fn id() -> &'static str;
     /// Display string
     fn name(&self) -> &'static str;
     /// State of development

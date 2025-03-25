@@ -1,11 +1,11 @@
 use crate::Instance;
-use metadata_provider::Error;
+use metadata_provider::{fetcher::Client, Error};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 impl Instance {
-    pub async fn lookup(&self, id: &str) -> Result<Root1, Error> {
-        self.client
+    pub async fn lookup(&self, client: &Client, id: &str) -> Result<Root1, Error> {
+        client
             .get(format!("https://kitsu.app/api/edge/anime/{id}"))
             .send()
             .await?

@@ -53,6 +53,8 @@ impl Service for ScanService {
                             let p = group.data.detect_path;
                             detect.push(async move {
                                 if let Some(path) = p {
+                                    // TODO: illegal fils
+                                    // TODO: rerun detect on file system changes
                                     let detected =
                                         storage_finder::parse_library(&path, &Default::default())
                                             .await;

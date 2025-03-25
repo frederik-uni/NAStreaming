@@ -1,6 +1,6 @@
 use metadata_provider::{
     async_trait,
-    fetcher::{reqwest::header::AUTHORIZATION, Url},
+    fetcher::{reqwest::header::AUTHORIZATION, Client, Url},
     search::{Capabilities, SearchProvider, SearchResult},
 };
 use serde::Deserialize;
@@ -19,6 +19,7 @@ impl SearchProvider for Instance {
 
     async fn search(
         &self,
+        client: &Client,
         query: &str,
         year: Option<u16>,
         series: Option<bool>,
@@ -37,8 +38,7 @@ impl SearchProvider for Instance {
             url.query_pairs_mut().append_pair("year", &year.to_string());
         }
 
-        let data: Root1 = self
-            .client
+        let data: Root1 = client
             .get(url)
             .header(AUTHORIZATION, format!("Bearer {}", self.access_token))
             .send()

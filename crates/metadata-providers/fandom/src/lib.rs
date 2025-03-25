@@ -2,11 +2,10 @@ mod search;
 
 use std::collections::HashMap;
 
-use metadata_provider::{fetcher::Client, DataRetrievel, MetadataProvider};
+use metadata_provider::{DataRetrievel, MetadataProvider};
 use scraper::Selector;
 
 pub struct Instance {
-    pub client: Client,
     pub articles: Selector,
     pub a: Selector,
     pub desc: Selector,
@@ -14,8 +13,10 @@ pub struct Instance {
     pub cover: Selector,
 }
 
-impl MetadataProvider for Instance {
-    fn new(_data: HashMap<String, String>) -> Result<Box<Self>, String> {
+impl Instance {
+    pub fn new(
+        _data: HashMap<String, String>,
+    ) -> Result<Box<dyn MetadataProvider + 'static>, String> {
         Ok(Box::new(Self {
             articles: Selector::parse("#mw-content-text > section > div > ul > li").expect("selector hardcoded"),
             a:Selector::parse("article > div.unified-search__result__community__content > a")
@@ -25,13 +26,13 @@ impl MetadataProvider for Instance {
                 Selector::parse("article > div.unified-search__result__community__thumbnail > a > img")
                     .expect("selector hardcoded"),
                 kind: Selector::parse("article > div.unified-search__result__community__content > div.unified-search__result__community__content__hub").expect("selector hardcoded"),
-            client: Default::default(),
         }))
     }
-    fn id() -> &'static str {
-        "fandom"
-    }
+}
 
+pub const ID: &'static str = "fandom";
+
+impl MetadataProvider for Instance {
     fn name(&self) -> &'static str {
         "Fandom"
     }
@@ -63,7 +64,7 @@ impl MetadataProvider for Instance {
 
 #[cfg(test)]
 mod tests {
-    use metadata_provider::MetadataProvider;
+    use metadata_provider::{fetcher::Client, MetadataProvider};
 
     use crate::Instance;
 
@@ -73,7 +74,7 @@ mod tests {
         let search_instance = instance.search().expect("unreachable");
 
         let result = search_instance
-            .search("One piece", None, None)
+            .search(&Client::new(), "One piece", None, None)
             .await
             .expect("Test failed");
 

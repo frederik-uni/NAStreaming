@@ -20,6 +20,9 @@ impl<T: DeserializeOwned> Clone for RecordIdTyped<T> {
 }
 
 impl<T: DeserializeOwned> RecordIdTyped<T> {
+    pub fn id(&self) -> &RecordId {
+        &self.id
+    }
     pub fn get(self) -> impl std::future::Future<Output = Result<Option<Record<T>>, Error>> {
         async move { DB.select(self.id).await }
     }

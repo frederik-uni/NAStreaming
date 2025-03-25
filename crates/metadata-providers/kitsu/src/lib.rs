@@ -3,22 +3,21 @@ mod search;
 
 use std::collections::HashMap;
 
-use metadata_provider::{fetcher::Client, MetadataProvider};
+use metadata_provider::MetadataProvider;
 
-pub struct Instance {
-    client: Client,
+pub struct Instance {}
+
+impl Instance {
+    pub fn new(
+        _data: HashMap<String, String>,
+    ) -> Result<Box<dyn MetadataProvider + 'static>, String> {
+        Ok(Box::new(Self {}))
+    }
 }
 
-impl MetadataProvider for Instance {
-    fn new(_data: HashMap<String, String>) -> Result<Box<Self>, String> {
-        Ok(Box::new(Self {
-            client: Default::default(),
-        }))
-    }
-    fn id() -> &'static str {
-        "kitsu"
-    }
+pub const ID: &'static str = "kitsu";
 
+impl MetadataProvider for Instance {
     fn name(&self) -> &'static str {
         "Kitsu"
     }
@@ -46,7 +45,7 @@ impl MetadataProvider for Instance {
 
 #[cfg(test)]
 mod tests {
-    use metadata_provider::MetadataProvider;
+    use metadata_provider::{fetcher::Client, MetadataProvider};
 
     use crate::Instance;
 
@@ -55,7 +54,7 @@ mod tests {
         let instance = Instance::new(Default::default()).expect("unreachable");
         let search_instance = instance.search().expect("unreachable");
         let result = search_instance
-            .search("One piece", Some(1999), Some(true))
+            .search(&Client::new(), "One piece", Some(1999), Some(true))
             .await
             .expect("Test failed");
 

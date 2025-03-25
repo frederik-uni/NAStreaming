@@ -9,7 +9,7 @@ edition = { workspace = true }
 regex = {  workspace=true }
 tokio = { workspace = true, features = ["full"] }
 serde = { workspace=true, features = ["derive"] }
-bigdecimal = {version = "0.4.7", features = ["serde"]}
+bigdecimal = { version = "0.4.7", features = ["serde"] }
 async-recursion.workspace=true
 
 [dev-dependencies]

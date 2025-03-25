@@ -10,6 +10,7 @@ use crate::error::{ApiError, ApiResult};
 pub mod auth;
 mod ffprobe;
 mod hash;
+pub mod metadata;
 mod rename;
 pub mod scan;
 mod split_files;
@@ -75,12 +76,6 @@ impl Services {
             .iter()
             .map(|(id, service)| (id.to_owned(), service.running()))
             .collect()
-    }
-
-    fn is_running(&self, id: &str) -> bool {
-        self.services
-            .get(id)
-            .map_or(false, |service| service.running())
     }
 
     fn update(&mut self) {

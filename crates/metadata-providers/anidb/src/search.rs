@@ -1,6 +1,6 @@
 use metadata_provider::{
     async_trait,
-    fetcher::Url,
+    fetcher::{Client, Url},
     search::{Capabilities, SearchProvider, SearchResult},
     Error,
 };
@@ -11,6 +11,7 @@ use crate::Instance;
 impl SearchProvider for Instance {
     async fn search(
         &self,
+        client: &Client,
         query: &str,
         year: Option<u16>,
         _series: Option<bool>,
@@ -24,7 +25,7 @@ impl SearchProvider for Instance {
             url.query_pairs_mut()
                 .append_pair("season.year", &year.to_string());
         }
-        let document = self.client.get(url).with_user_agent().send().await?.html();
+        let document = client.get(url).with_user_agent().send().await?.html();
 
         if let Some(edit) = document.select(&self.edit).next() {
             return Ok(vec![SearchResult {

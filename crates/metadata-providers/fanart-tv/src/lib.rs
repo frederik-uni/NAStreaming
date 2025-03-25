@@ -3,26 +3,25 @@ mod search;
 
 use std::collections::HashMap;
 
-use metadata_provider::{fetcher::Client, MetadataProvider};
+use metadata_provider::MetadataProvider;
 
 pub struct Instance {
-    client: Client,
     key: String,
 }
 
-impl MetadataProvider for Instance {
-    fn new(data: HashMap<String, String>) -> Result<Box<Self>, String> {
+pub const ID: &'static str = "fanart-tv";
+
+impl Instance {
+    pub fn new(
+        data: HashMap<String, String>,
+    ) -> Result<Box<dyn MetadataProvider + 'static>, String> {
         let key = data.get("key").ok_or("No key given".to_owned())?.to_owned();
 
-        Ok(Box::new(Self {
-            key,
-            client: Default::default(),
-        }))
+        Ok(Box::new(Self { key }))
     }
-    fn id() -> &'static str {
-        "fanart-tv"
-    }
+}
 
+impl MetadataProvider for Instance {
     fn name(&self) -> &'static str {
         "FanArt"
     }
@@ -57,17 +56,17 @@ impl MetadataProvider for Instance {
 mod tests {
     use std::{collections::HashMap, fs::read_to_string};
 
-    use metadata_provider::MetadataProvider;
+    use metadata_provider::{fetcher::Client, MetadataProvider};
     use toml::Value;
 
-    use crate::Instance;
+    use crate::{Instance, ID};
 
     #[tokio::test]
     async fn demo() {
         let data = read_to_string("../../../Config.toml").unwrap();
         let parsed: HashMap<String, HashMap<String, Value>> = toml::from_str(&data).unwrap();
         let map = parsed
-            .get(Instance::id())
+            .get(ID)
             .cloned()
             .unwrap_or_default()
             .into_iter()
@@ -76,7 +75,7 @@ mod tests {
         let instance = Instance::new(map).expect("unreachable");
         let search_instance = instance.search().expect("unreachable");
         let result = search_instance
-            .search("One piece", None, Some(true))
+            .search(&Client::new(), "One piece", None, Some(true))
             .await
             .expect("Test failed");
 

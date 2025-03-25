@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use storage_finder::{Cut, Entry, Episode, FileType, Kind, Resolutions, ThreeD};
-use surrealdb::Error;
+use surrealdb::{Error, RecordId};
 
 use crate::file_group::FileGroup;
 use crate::utils::DbUtils;
@@ -13,6 +13,7 @@ pub type Value = ();
 table!(File, "files");
 #[derive(Deserialize, Serialize)]
 pub struct File {
+    pub root_path: PathBuf,
     pub path: PathBuf,
     pub info: Info,
     pub linked: bool,
@@ -21,7 +22,51 @@ pub struct File {
     pub hash: Option<String>,
 }
 
+#[derive(Deserialize, Serialize)]
+pub struct FileValidate {
+    pub root_path: PathBuf,
+    pub path: PathBuf,
+    pub info: Unidentified,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct FilePath {
+    pub id: RecordId,
+    pub root_path: PathBuf,
+}
+
 impl File {
+    pub async fn group() -> Result<HashMap<PathBuf, Vec<RecordId>>, Error> {
+        let items: Vec<FilePath> = DB
+            .query(format!(
+                "SELECT id, root_path FROM {} WHERE linked = false",
+                Self::table()
+            ))
+            .await?
+            .take(0)?;
+        let mut hm: HashMap<PathBuf, Vec<RecordId>> = HashMap::new();
+        for item in items {
+            hm.entry(item.root_path).or_default().push(item.id);
+        }
+        Ok(hm)
+    }
+
+    pub async fn get_info(items: Vec<String>) -> Result<Vec<FileValidate>, Error> {
+        Ok(DB
+            .query(format!(
+                "SELECT id, root_path, path, info FROM $ids WHERE linked = false"
+            ))
+            .bind((
+                "ids",
+                items
+                    .into_iter()
+                    .map(|v| RecordId::from((Self::table(), v.as_str())))
+                    .collect::<Vec<_>>(),
+            ))
+            .await?
+            .take(0)?)
+    }
+
     pub async fn find_related(
         path: PathBuf,
     ) -> Result<Option<RecordIdTyped<crate::metadata::Entry>>, Error> {
@@ -56,7 +101,8 @@ impl File {
             };
             insert.push(File {
                 path: v.path,
-                info: Info::Unidified {
+                root_path: v.root_path,
+                info: Info::Unidified(Unidentified {
                     try_group: related,
                     name: v.name,
                     ep_name: v.ep_name,
@@ -68,7 +114,7 @@ impl File {
                     three_ds: v.three_ds,
                     extended: v.extended,
                     kinds: v.kinds,
-                },
+                }),
                 file_type: v.file_type,
                 ffprobe: None,
                 hash: None,
@@ -91,17 +137,20 @@ pub enum Info {
         extended: Option<Cut>,
         three_d: Option<ThreeD>,
     },
-    Unidified {
-        try_group: Option<RecordIdTyped<crate::metadata::Entry>>,
-        name: Vec<String>,
-        ep_name: Vec<String>,
-        sure: bool,
-        season: Vec<u64>,
-        episode: Vec<Episode>,
-        year: Vec<u16>,
-        resolutions: Vec<Resolutions>,
-        three_ds: Vec<ThreeD>,
-        extended: Vec<Cut>,
-        kinds: Vec<Kind>,
-    },
+    Unidified(Unidentified),
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Unidentified {
+    pub try_group: Option<RecordIdTyped<crate::metadata::Entry>>,
+    pub name: Vec<String>,
+    pub ep_name: Vec<String>,
+    pub sure: bool,
+    pub season: Vec<u64>,
+    pub episode: Vec<Episode>,
+    pub year: Vec<u16>,
+    pub resolutions: Vec<Resolutions>,
+    pub three_ds: Vec<ThreeD>,
+    pub extended: Vec<Cut>,
+    pub kinds: Vec<Kind>,
 }
