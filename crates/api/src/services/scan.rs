@@ -1,6 +1,7 @@
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use models::{files::File, scan_groups::ScanGroup, DbUtils};
+use storage_finder::PathTree;
 use tokio::task::AbortHandle;
 
 use crate::error::{ApiError, ReportError};
@@ -18,7 +19,7 @@ impl ScanService {
         }
     }
 }
-fn extract_ctx(ctx: Vec<Value>) -> Option<(Option<bool>, Option<String>)> {
+fn extract_ctx(ctx: &Vec<Value>) -> Option<(Option<bool>, Option<String>)> {
     if ctx.len() == 2 {
         Some((Some(ctx[0].as_bool()?), Some(ctx[1].as_str()?.to_string())))
     } else if ctx.len() == 1 {
@@ -35,10 +36,15 @@ fn extract_ctx(ctx: Vec<Value>) -> Option<(Option<bool>, Option<String>)> {
 }
 
 impl Service for ScanService {
-    fn start_with_ctx_internal(&self, ctx: Vec<Value>, callback: Box<dyn FnOnce() + Send>) {
+    fn start_with_ctx_internal(
+        &self,
+        id: String,
+        ctx: Vec<Value>,
+        callback: Box<dyn FnOnce(&str, &Vec<Value>) + Send>,
+    ) {
         self.handle.lock().unwrap().replace(
             tokio::task::spawn(async move {
-                if let Some((scan_detect, id)) = extract_ctx(ctx) {
+                if let Some((scan_detect, id)) = extract_ctx(&ctx) {
                     let groups = match id {
                         Some(id) => vec![ScanGroup::get(&id)
                             .await
@@ -48,26 +54,32 @@ impl Service for ScanService {
                     };
                     let mut detect = vec![];
                     let mut no_detect = vec![];
+                    //TODO: dont load every path
+                    let mut tree = PathTree::default();
+                    for item in File::paths().await.map_err(ApiError::from)? {
+                        tree.insert(&item);
+                    }
+                    let tree = Arc::new(tree);
+
                     for group in groups {
                         if scan_detect.is_none() || scan_detect == Some(true) {
-                            let p = group.data.detect_path;
+                            let tree = tree.clone();
                             detect.push(async move {
-                                if let Some(path) = p {
-                                    // TODO: illegal fils
+                                if let Some(path) = group.data.detect_path {
                                     // TODO: rerun detect on file system changes
                                     let detected =
-                                        storage_finder::parse_library(&path, &Default::default())
-                                            .await;
+                                        storage_finder::parse_library(&path, &tree).await;
                                     File::add_entries(detected).await.map_err(ApiError::from)?;
                                 }
                                 Ok::<(), ReportError>(())
                             });
                         }
                         if scan_detect.is_none() || scan_detect == Some(false) {
-                            let p = group.data.path;
+                            let tree = tree.clone();
+
                             no_detect.push(async move {
                                 let detected =
-                                    storage_finder::parse_library(&p, &Default::default()).await;
+                                    storage_finder::parse_library(&group.data.path, &tree).await;
                                 File::add_entries(detected).await.map_err(ApiError::from)?;
                                 Ok::<(), ReportError>(())
                             });
@@ -76,15 +88,11 @@ impl Service for ScanService {
                     for future in detect {
                         future.await?;
                     }
-                    println!("start_scan");
                     for future in no_detect {
-                        match future.await {
-                            Ok(v) => (),
-                            Err(v) => println!("error: {:?}", v),
-                        };
+                        future.await?;
                     }
                 }
-                callback();
+                callback(&id, &ctx);
                 Ok::<_, ReportError>(())
             })
             .abort_handle(),

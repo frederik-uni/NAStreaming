@@ -45,6 +45,7 @@ pub enum Status {
     PreProduction,
     Released,
     Upcoming,
+    Unknown,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -117,7 +118,7 @@ pub struct File {
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "openapi",
     derive(schemars::JsonSchema, apistos::ApiComponent)

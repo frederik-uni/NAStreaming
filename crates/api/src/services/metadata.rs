@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 
-use metadata_provider::{
-    fetcher::Client,
-    search::{Capabilities, SearchResult},
-    DataRetrievel, MetadataProvider, State,
-};
+use metadata_provider::{fetcher::Client, search::SearchResult, MetadataProvider};
+use structures::metadata_provider::Provider;
 
 use crate::error::{ApiError, ApiResult};
 
@@ -12,16 +9,6 @@ pub struct MetadataService {
     high: Client,
     low: Client,
     services: HashMap<&'static str, Box<dyn MetadataProvider>>,
-}
-
-pub struct Provider {
-    id: String,
-    name: &'static str,
-    origin: &'static str,
-    state: State,
-    data_retrievel: DataRetrievel,
-    search: Option<Vec<Capabilities>>,
-    info: bool,
 }
 
 impl MetadataService {
@@ -32,9 +19,14 @@ impl MetadataService {
                 id: k.to_string(),
                 name: v.name(),
                 origin: v.origin(),
-                state: v.state(),
-                data_retrievel: v.data_retrievel(),
-                search: v.search().map(|v| v.capabilities()),
+                state: v.state().to_string(),
+                data_retrievel: v.data_retrievel().to_string(),
+                search: v.search().map(|v| {
+                    v.capabilities()
+                        .into_iter()
+                        .map(|v| v.to_string())
+                        .collect()
+                }),
                 info: v.info().is_some(),
             })
             .collect()
@@ -52,7 +44,7 @@ impl MetadataService {
             .get(id)
             .ok_or(ApiError::NotFoundInDb)?
             .search()
-            .ok_or(ApiError::NotImplemented)?
+            .ok_or(ApiError::NotFoundInDb)?
             .search(&self.high, query, year, series)
             .await
             .unwrap())

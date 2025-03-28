@@ -18,6 +18,31 @@ impl Display for Resolutions {
     }
 }
 
+impl TryFrom<String> for Resolutions {
+    type Error = ();
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let value = value.trim();
+
+        if let Some((width, height)) = value.split_once('x') {
+            let width = width.trim().parse::<u32>().map_err(|_| ())?;
+            let height = height.trim().parse::<u32>().map_err(|_| ())?;
+            Ok(Resolutions {
+                width: Some(width),
+                height,
+            })
+        } else if let Some(height_str) = value.strip_suffix('p') {
+            let height = height_str.trim().parse::<u32>().map_err(|_| ())?;
+            Ok(Resolutions {
+                width: None,
+                height,
+            })
+        } else {
+            Err(())
+        }
+    }
+}
+
 impl Resolutions {
     pub fn from_str(input: &str) -> Option<(Self, String)> {
         let pattern_str = format!(

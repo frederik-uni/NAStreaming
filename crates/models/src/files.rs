@@ -2,12 +2,13 @@ use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use storage_finder::{Cut, Entry, Episode, FileType, Kind, Resolutions, ThreeD};
+use surrealdb::opt::PatchOp;
 use surrealdb::{Error, RecordId};
 
 use crate::file_group::FileGroup;
-use crate::utils::DbUtils;
-use crate::DB;
+use crate::utils::{DbUtils, Empty};
 use crate::{table, utils::RecordIdTyped};
+use crate::{Record, DB};
 
 pub type Value = ();
 table!(File, "files");
@@ -33,25 +34,56 @@ pub struct FileValidate {
 pub struct FilePath {
     pub id: RecordId,
     pub root_path: PathBuf,
+    pub path: PathBuf,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Grouped {
+    gpath: PathBuf,
+    ids: Vec<RecordId>,
 }
 
 impl File {
+    pub async fn update_info(id: RecordIdTyped<File>, info: Info) -> Result<(), Error> {
+        let _: Option<Empty> = DB
+            .update(id.id())
+            .patch(PatchOp::replace("/info", info))
+            .await?;
+        let _: Option<Empty> = DB
+            .update(id.id())
+            .patch(PatchOp::replace("/linked", true))
+            .await?;
+        Ok(())
+    }
+    pub async fn paths() -> Result<Vec<PathBuf>, Error> {
+        DB.query(format!(
+            "(SELECT root_path + path AS full_path FROM {}).full_path",
+            Self::table()
+        ))
+        .await?
+        .take(0)
+    }
+
     pub async fn group() -> Result<HashMap<PathBuf, Vec<RecordId>>, Error> {
-        let items: Vec<FilePath> = DB
+        let items: Vec<Grouped> = DB
             .query(format!(
-                "SELECT id, root_path FROM {} WHERE linked = false",
+                "
+                SELECT
+                    array::group(id) AS ids,
+                    root_path + \"/\" + array::first(string::split(path, \"/\")) AS gpath
+                FROM {}
+                WHERE linked = false
+                GROUP BY gpath;
+                ",
                 Self::table()
             ))
             .await?
             .take(0)?;
-        let mut hm: HashMap<PathBuf, Vec<RecordId>> = HashMap::new();
-        for item in items {
-            hm.entry(item.root_path).or_default().push(item.id);
-        }
-        Ok(hm)
+
+        Ok(items.into_iter().map(|v| (v.gpath, v.ids)).collect())
     }
 
-    pub async fn get_info(items: Vec<String>) -> Result<Vec<FileValidate>, Error> {
+    pub async fn get_info(items: Vec<String>) -> Result<Vec<Record<FileValidate>>, Error> {
         Ok(DB
             .query(format!(
                 "SELECT id, root_path, path, info FROM $ids WHERE linked = false"
@@ -83,27 +115,13 @@ impl File {
         }
     }
     pub async fn add_entries(entries: Vec<Entry>) -> Result<Option<()>, Error> {
+        //TODO: check deleted
         let mut insert = vec![];
-        let mut cache: HashMap<PathBuf, Option<RecordIdTyped<crate::metadata::Entry>>> =
-            HashMap::new();
         for v in entries {
-            let mut group_path = v.root_path.clone();
-            if let Some(v) = v.path.components().next() {
-                group_path = group_path.join(v);
-            }
-            let related = match cache.get(&group_path) {
-                Some(v) => v.clone(),
-                None => {
-                    let related = Self::find_related(group_path.clone()).await?;
-                    cache.insert(group_path, related.clone());
-                    related
-                }
-            };
             insert.push(File {
                 path: v.path,
                 root_path: v.root_path,
                 info: Info::Unidified(Unidentified {
-                    try_group: related,
                     name: v.name,
                     ep_name: v.ep_name,
                     sure: v.sure,
@@ -131,9 +149,9 @@ impl File {
 #[serde(untagged)]
 pub enum Info {
     Identified {
-        group_id: String,
-        res: Option<Resolutions>,
-        kinds: Option<Kind>,
+        group_id: RecordIdTyped<FileGroup>,
+        resolution: Option<Resolutions>,
+        kind: Option<Kind>,
         extended: Option<Cut>,
         three_d: Option<ThreeD>,
     },
@@ -142,7 +160,6 @@ pub enum Info {
 
 #[derive(Serialize, Deserialize)]
 pub struct Unidentified {
-    pub try_group: Option<RecordIdTyped<crate::metadata::Entry>>,
     pub name: Vec<String>,
     pub ep_name: Vec<String>,
     pub sure: bool,

@@ -19,7 +19,8 @@ pub struct LinkOverviewResponse {
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
 pub struct FileValidate {
-    pub group_id: String,
+    pub file_id: String,
+    pub scan_group_id: String,
     pub path: PathBuf,
     pub info: Unidified,
 }
@@ -39,6 +40,7 @@ pub struct FileValidationResponse {
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
 pub struct Unidified {
+    /// Entry id
     pub try_group: Option<String>,
     pub name: Vec<String>,
     pub ep_name: Vec<String>,

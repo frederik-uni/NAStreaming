@@ -6,7 +6,7 @@ use structures::link::LinkOverviewResponse;
 use crate::error::ApiResult;
 
 #[api_operation(
-    tag = "metadata-provider",
+    tag = "file",
     summary = "Groups by path and returns a map of file ids",
     description = r###""###
 )]
@@ -28,5 +28,5 @@ async fn exec() -> ApiResult<Json<LinkOverviewResponse>> {
 }
 
 pub fn register() -> apistos::web::Resource {
-    apistos::web::resource("/overview").route(apistos::web::get().to(exec))
+    apistos::web::resource("/overview-unlinked").route(apistos::web::get().to(exec))
 }

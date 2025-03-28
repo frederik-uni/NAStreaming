@@ -45,7 +45,8 @@ impl MetadataProvider for Instance {
     }
 
     fn id_to_url(&self, id: &str) -> String {
-        format!("https://thetvdb.com/dereferrer/series/{id}")
+        let (kind, id) = id.split_once("-").unwrap_or_default();
+        format!("https://thetvdb.com/dereferrer/{kind}/{id}")
     }
 
     fn data_retrievel(&self) -> metadata_provider::DataRetrievel {

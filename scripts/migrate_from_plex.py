@@ -14,6 +14,8 @@ def run(baseurl, token):
         remove = len(section.locations[0]) + 1
         sec: Library = plex.library.section(section.title)
         for video in sec.search(unwatched=False) + sec.search(inProgress=True):
+            if video is None:
+                continue
             if video.type == "show":
                 for episode in video.episodes():
                     if episode.isWatched or episode.viewOffset >= 60000:

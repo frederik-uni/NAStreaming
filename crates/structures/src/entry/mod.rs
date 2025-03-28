@@ -10,8 +10,12 @@ use serde::{Deserialize, Serialize};
     derive(schemars::JsonSchema, apistos::ApiComponent)
 )]
 pub struct AddEntryRequest {
-    pub name: String,
-    pub path: Option<String>,
+    pub scan_group_id: String,
+    /// either url or {provider}/{id}
+    ///
+    /// tv-db/series-1234
+    pub ids: Vec<String>,
+    pub series: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

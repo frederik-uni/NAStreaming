@@ -1,4 +1,7 @@
 import requests
+import json
+import time
+
 base = "http://127.0.0.1:8085/api/v1"
 headers = {'accept': 'application/json'}
 
@@ -14,7 +17,7 @@ def init():
             },
             "group": {
                 "name": "Anime",
-                "path": "/Users/frederik/movie_files",
+                "path": "/Users/frederik/movie_files/testset/",
                 "prefered_display_order": [],
                 "prefered_index_order": [],
             }
@@ -35,8 +38,48 @@ def start_scan():
     assert response.json() == ["scan"]
     response = requests.put(base+"/services/dispatch", json={"service": "scan", "ctx": id}, headers=headers)
     print(response, response.text)
+    time.sleep(10)
+
+def search():
+    response = requests.get(base+"/metadata-provider/providers", headers=headers)
+    print(json.dumps(response.json(), indent=4))
+    response = requests.post(base+"/metadata-provider/search", json={
+        "id": "tv-db",
+        "query": "One Piece",
+        "year": 1999,
+        "series": True
+
+    }, headers=headers)
+    print(json.dumps(response.json(), indent=4))
+
+def process():
+    response = requests.get(base+"/file/overview-unlinked", headers=headers)
+    for key, value in response.json()["data"].items():
+        response = requests.post(base+"/file/list-unlinked", json={"ids": value},headers=headers)
+        json = response.json();
+        items_json = json["items"]
+        name = items_json[0]["info"]["name"][0]
+        year = next(iter((items_json[0]["info"]["year"])), None)
+        scan_group_id =items_json[0]["scan_group_id"]
+        response = requests.post(base+"/metadata-provider/search", json={
+            "id": "tv-db",
+            "query": name,
+            "year": year,
+            "series": True
+        }, headers=headers)
+
+        response = requests.put(base+"/entry/add", json={"scan_group_id": scan_group_id,
+        "ids": ["tv-db/" + response.json()["items"][0]["id"]],
+        "series": True
+        }, headers=headers)
+        entry_id = response.json()
+        items = [{"file_id": v["file_id"], "season": v["info"]["season"][0], "episode": v["info"]["episode"][0]} for v in items_json];
+        response = requests.put(base+"/file/link-entry", json={ "entry_id": entry_id,
+        "items": items}, headers=headers)
 
 if __name__ == "__main__":
     token = init()
     headers['Authorization'] =  f'Bearer {token}'
-    start_scan()
+    #search()
+    #start_scan()
+    process()

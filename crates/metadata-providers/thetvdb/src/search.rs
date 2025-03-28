@@ -51,7 +51,7 @@ impl SearchProvider for Instance {
             .data
             .into_iter()
             .map(|v| {
-                let (kind, id) = v.id.split_once("-").unwrap_or_default();
+                let kind = (&v.id).split_once("-").unwrap_or_default().0.to_owned();
                 let title = v.translations.unwrap_or_default().get("eng").cloned();
                 let mut names = match title {
                     Some(v) => vec![v],
@@ -66,7 +66,7 @@ impl SearchProvider for Instance {
                 }
                 names.append(&mut v.aliases.unwrap_or_default());
                 SearchResult {
-                    id: id.to_owned(),
+                    id: v.id,
                     names,
                     overview: v
                         .overviews
@@ -75,7 +75,7 @@ impl SearchProvider for Instance {
                         .cloned()
                         .or(v.overview),
                     cover: Some(v.thumbnail.unwrap_or(v.image_url)),
-                    kind: Some(kind.to_owned()),
+                    kind: Some(kind),
                     first_aired: v.year,
                 }
             })

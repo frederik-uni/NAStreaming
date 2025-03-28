@@ -2,6 +2,7 @@ use std::fmt::{Display, Formatter};
 
 use actix_web::{http::StatusCode, ResponseError};
 use apistos::ApiErrorComponent;
+use storage_finder::ParseBigDecimalError;
 
 pub type StartUpResult<T> = Result<T, StartUpError>;
 pub type ApiResult<T> = Result<T, ApiError>;
@@ -20,14 +21,22 @@ pub enum ApiError {
     Surreal(models::Error),
     LoginFailed,
     InvalidBirthdate(chrono::ParseError),
+    MetadatProvider(metadata_provider::Error),
+    BigDecimalParse(ParseBigDecimalError),
 }
 
 #[derive(Debug)]
 pub struct ReportError;
 
+impl From<ParseBigDecimalError> for ApiError {
+    fn from(value: ParseBigDecimalError) -> Self {
+        Self::BigDecimalParse(value)
+    }
+}
+
 impl From<metadata_provider::Error> for ApiError {
     fn from(error: metadata_provider::Error) -> Self {
-        todo!()
+        Self::MetadatProvider(error)
     }
 }
 

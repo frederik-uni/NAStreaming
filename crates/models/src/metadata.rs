@@ -2,44 +2,81 @@ use std::{collections::HashMap, time::Duration};
 
 use serde::{Deserialize, Serialize};
 use structures::{Kind, Status};
+use surrealdb::{opt::PatchOp, Datetime, Error};
+
+use crate::{
+    file_group::FileGroup,
+    scan_groups::ScanGroup,
+    table,
+    utils::{Empty, RecordIdTyped},
+    DB,
+};
 
 pub type Id = String;
-pub type LocationId = String;
-pub type LanguageId = String;
 pub type Timestamp = Duration;
 
+table!(Country, "countries");
+#[derive(Deserialize, Serialize)]
+pub struct Country {
+    name: String,
+}
+
+table!(Language, "languages");
+#[derive(Deserialize, Serialize)]
+pub struct Language {
+    name: String,
+}
+
+table!(Entry, "entries");
 #[derive(Deserialize, Serialize)]
 pub struct Entry {
-    pub titles: HashMap<LanguageId, Vec<String>>,
-    pub description: HashMap<LanguageId, String>,
+    pub titles: HashMap<String, Vec<String>>,
+    pub description: HashMap<String, String>,
     pub links: Vec<Source>,
     pub status: Status,
-    pub release_dates: Vec<(LocationId, Timestamp)>,
+    pub release_dates: Vec<(RecordIdTyped<Country>, Timestamp)>,
     pub content_ratings: Vec<ContentRating>,
     pub categories: Vec<Id>,
     pub kind: Kind,
-    pub original_country: LocationId,
-    pub original_language: LanguageId,
-    pub spoken_language: LanguageId,
+    pub original_country: Option<RecordIdTyped<Country>>,
+    pub original_language: Option<RecordIdTyped<Language>>,
+    pub spoken_language: Option<RecordIdTyped<Language>>,
     pub assets: Vec<Asset>,
     pub awards: Vec<Award>,
-    pub updated: u64,
-    pub created: u64,
-    pub budget: u64,
-    pub box_office: Vec<(LocationId, u64)>,
-    pub geo_location: Vec<LocationId>,
+    /// key = Provider
+    /// key.is_empty() = Manual user override
+    pub updated: HashMap<String, Datetime>,
+    pub created: Datetime,
+    pub budget: Option<u64>,
+    pub box_office: Vec<(RecordIdTyped<Country>, u64)>,
+    pub geo_location: Vec<RecordIdTyped<Country>>,
     pub time_period: Id,
     pub characters: Vec<Cast>,
     pub companies: Companies,
+    pub scan_group: RecordIdTyped<ScanGroup>,
+    pub files: Vec<RecordIdTyped<FileGroup>>,
+}
+
+impl Entry {
+    pub async fn add_file_group(
+        id: RecordIdTyped<Entry>,
+        group: RecordIdTyped<FileGroup>,
+    ) -> Result<(), Error> {
+        let _: Option<Empty> = DB
+            .update(id.id())
+            .patch(PatchOp::add("/files", group))
+            .await?;
+        Ok(())
+    }
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct Companies {
-    pub studio: Vec<(LocationId, Id)>,
-    pub network: Vec<(LocationId, Id)>,
-    pub production: Vec<(LocationId, Id)>,
-    pub distributor: Vec<(LocationId, Id)>,
-    pub special_effects: Vec<(LocationId, Id)>,
+    pub studio: Vec<(RecordIdTyped<Country>, Id)>,
+    pub network: Vec<(RecordIdTyped<Country>, Id)>,
+    pub production: Vec<(RecordIdTyped<Country>, Id)>,
+    pub distributor: Vec<(RecordIdTyped<Country>, Id)>,
+    pub special_effects: Vec<(RecordIdTyped<Country>, Id)>,
 }
 #[derive(Deserialize, Serialize)]
 pub struct Cast {
@@ -65,7 +102,7 @@ pub struct Award {
 
 #[derive(Deserialize, Serialize)]
 pub struct Asset {
-    lang: Option<LanguageId>,
+    lang: Option<RecordIdTyped<Language>>,
     source: String,
     kind: AssetKind,
 }
@@ -101,7 +138,26 @@ pub enum ContentRatingUSA {
 
 #[derive(Deserialize, Serialize)]
 pub enum Source {
-    TheTvDb(u64),
+    TvDB { series: bool, id: u64 },
     TheMovieDb(u64),
     CustomUrl(String),
+    CustomIdk(String),
+}
+
+impl From<&String> for Source {
+    fn from(value: &String) -> Self {
+        match value.split_once("/") {
+            Some((key, value)) => match key {
+                "tv-db" => {
+                    let (kind, id) = value.split_once("-").unwrap_or_default();
+                    Self::TvDB {
+                        series: kind == "series",
+                        id: id.parse().unwrap_or_default(),
+                    }
+                }
+                _ => Self::CustomUrl(value.to_owned()),
+            },
+            None => Self::CustomIdk(value.to_owned()),
+        }
+    }
 }

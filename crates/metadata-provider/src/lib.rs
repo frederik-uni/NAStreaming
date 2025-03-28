@@ -1,6 +1,8 @@
 pub mod fetcher;
 pub mod search;
 
+use std::fmt::Display;
+
 use search::SearchProvider;
 
 pub use async_trait::async_trait;
@@ -10,12 +12,43 @@ pub enum State {
     WIP,
     Running,
 }
+
+impl Display for State {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                State::Planed => "planed",
+                State::WIP => "wip",
+                State::Running => "running",
+            }
+        )
+    }
+}
+
 pub enum DataRetrievel {
     Unknown,
     Scraping,
     Api,
     SearchInternalApiInfoApi,
     SearchScraperInfoApi,
+}
+
+impl Display for DataRetrievel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                DataRetrievel::Unknown => "unknown",
+                DataRetrievel::Scraping => "scraping",
+                DataRetrievel::Api => "api",
+                DataRetrievel::SearchInternalApiInfoApi => "SearchInternalApiInfoApi",
+                DataRetrievel::SearchScraperInfoApi => "SearchScraperInfoApi",
+            }
+        )
+    }
 }
 
 #[derive(Debug)]

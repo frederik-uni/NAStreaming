@@ -10,6 +10,12 @@ pub struct RecordIdTyped<T: DeserializeOwned> {
     _marker: std::marker::PhantomData<T>,
 }
 
+impl<T: DeserializeOwned> From<RecordId> for RecordIdTyped<T> {
+    fn from(value: RecordId) -> Self {
+        RecordIdTyped::new(value)
+    }
+}
+
 impl<T: DeserializeOwned> Clone for RecordIdTyped<T> {
     fn clone(&self) -> Self {
         Self {
@@ -36,6 +42,9 @@ impl<T: DeserializeOwned> RecordIdTyped<T> {
 
 pub trait DbUtils: DeserializeOwned + Serialize + 'static {
     fn table() -> &'static str;
+    fn to_id(key: &str) -> RecordIdTyped<Self> {
+        RecordIdTyped::from(RecordId::from((Self::table(), key)))
+    }
     fn empty() -> impl std::future::Future<Output = Result<bool, Error>> {
         async {
             Ok(DB
@@ -85,4 +94,9 @@ macro_rules! table {
             }
         }
     };
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Empty {
+    pub id: RecordId,
 }

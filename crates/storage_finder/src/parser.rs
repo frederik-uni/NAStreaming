@@ -5,11 +5,11 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use crate::episode_guessing::episode_guess;
+use crate::path_tree::PathTree;
 use crate::resolution::Resolutions;
 use crate::segments::{parse_segments, segements2_to_tuple, Episode, Segment, Segment2};
 use crate::suffixes::{suffix_folder, suffixes, Cut, FileType, Kind, ThreeD};
-
-pub async fn parse_library(p: &Path, illegal: &HashSet<PathBuf>) -> Vec<Entry> {
+pub async fn parse_library(p: &Path, illegal: &PathTree) -> Vec<Entry> {
     let mut parse = vec![];
     for item in read_dir(p).await {
         parse.extend(parse_top(p, item, illegal).await);
@@ -178,7 +178,7 @@ fn parse_like_file(file_name: &str) -> Parsed {
     }
 }
 
-fn parse_file(path: &PathBuf, illegal: &HashSet<PathBuf>) -> Option<Parsed> {
+fn parse_file(path: &PathBuf, illegal: &PathTree) -> Option<Parsed> {
     if illegal.contains(path) {
         return None;
     }
@@ -207,10 +207,12 @@ async fn read_dir(path: &Path) -> Vec<PathBuf> {
     out
 }
 
-async fn parse_top(root_path: &Path, path: PathBuf, illegal: &HashSet<PathBuf>) -> Vec<Parsed> {
+async fn parse_top(root_path: &Path, path: PathBuf, illegal: &PathTree) -> Vec<Parsed> {
     if path.is_file() {
         match parse_file(&path, illegal) {
-            Some(v) => vec![v.set_path(path)],
+            Some(v) => {
+                vec![v.set_path(path.strip_prefix(root_path).unwrap_or(&path).to_path_buf())]
+            }
             None => vec![],
         }
     } else {
@@ -231,12 +233,14 @@ async fn parse_top(root_path: &Path, path: PathBuf, illegal: &HashSet<PathBuf>) 
 async fn parse_2(
     root_path: &Path,
     path: PathBuf,
-    illegal: &HashSet<PathBuf>,
+    illegal: &PathTree,
     data: &Parsed,
 ) -> Vec<Parsed> {
     if path.is_file() {
         match parse_file(&path, illegal) {
-            Some(v) => vec![data.join(&v).set_path(path)],
+            Some(v) => vec![data
+                .join(&v)
+                .set_path(path.strip_prefix(root_path).unwrap_or(&path).to_path_buf())],
             None => vec![],
         }
     } else {
@@ -281,7 +285,7 @@ fn parse_season(input: &str) -> Option<u64> {
 async fn parse_3(
     root_path: &Path,
     path: PathBuf,
-    illegal: &HashSet<PathBuf>,
+    illegal: &PathTree,
     data: &Parsed,
 ) -> Vec<Parsed> {
     if path.is_file() {
@@ -307,7 +311,7 @@ async fn parse_3(
 
         let mut out = vec![];
         for item in read_dir(&path).await {
-            out.extend(parse_4(item, illegal, &data).await);
+            out.extend(parse_4(root_path, item, illegal, &data).await);
         }
 
         out
@@ -315,10 +319,17 @@ async fn parse_3(
 }
 
 #[async_recursion::async_recursion]
-async fn parse_4(path: PathBuf, illegal: &HashSet<PathBuf>, data: &Parsed) -> Vec<Parsed> {
+async fn parse_4(
+    root_path: &Path,
+    path: PathBuf,
+    illegal: &PathTree,
+    data: &Parsed,
+) -> Vec<Parsed> {
     if path.is_file() {
         match parse_file(&path, illegal) {
-            Some(v) => vec![data.join(&v).set_path(path)],
+            Some(v) => vec![data
+                .join(&v)
+                .set_path(path.strip_prefix(root_path).unwrap_or(&path).to_path_buf())],
             None => vec![],
         }
     } else {
@@ -330,7 +341,7 @@ async fn parse_4(path: PathBuf, illegal: &HashSet<PathBuf>, data: &Parsed) -> Ve
         let data = data.join(&parse_like_file(file_name));
         let mut out = vec![];
         for item in read_dir(&path).await {
-            out.extend(parse_4(item, illegal, &data).await);
+            out.extend(parse_4(root_path, item, illegal, &data).await);
         }
 
         out
